@@ -1,0 +1,99 @@
+<ejb-jar xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/ejb-jar_3_2.xsd" version="3.2">
+
+	<enterprise-beans>
+		<session>
+			<ejb-name>EnvironmentEntriesHolder</ejb-name>
+			<env-entry>
+				<description>How often in days must user change their password</description>
+				<env-entry-name>passwordChangePeriodInDays</env-entry-name>
+				<env-entry-type>java.lang.Integer</env-entry-type>
+				<env-entry-value>90</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<description>Offset in millis between report run and reminders mass dispatch</description>
+				<env-entry-name>expiredPwdReportToReminderDelay</env-entry-name>
+				<env-entry-type>java.lang.Long</env-entry-type>
+				<env-entry-value>60000</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<description>How long in millis may be reminders being dispatched</description>
+				<env-entry-name>expiredPwdReminderSendingWindow</env-entry-name>
+				<env-entry-type>java.lang.Long</env-entry-type>
+				<env-entry-value>120000</env-entry-value>
+			</env-entry>
+
+			<env-entry>
+				<description>Connection string to the mongo server</description>
+				<env-entry-name>connectionStringMongo</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>mongodb://localhost:27017</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<description>Mapping of logical collection names to: 'physical_db_name'.'physical_collection_name'</description>
+				<env-entry-name>collection.location</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>test.location</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<env-entry-name>collection.conference</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>test.conference</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<env-entry-name>collection.speaker</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>test.speaker</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<env-entry-name>collection.user</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>ldap.user</env-entry-value>
+			</env-entry>
+		</session>
+
+		<session>
+			<ejb-name>EventToQueueMediator</ejb-name>
+			<resource-ref>
+				<res-ref-name>MyTestQueue</res-ref-name>
+				<injection-target>
+					<injection-target-class>org.swa.conf.business.service.EventToQueueMediator</injection-target-class>
+					<injection-target-name>queue</injection-target-name>
+				</injection-target>
+				<!-- Default WildFly 8.1.0 Example-Queue -->
+				<lookup-name>java:/jms/queue/DLQ</lookup-name>
+			</resource-ref>
+		</session>
+
+		<message-driven>
+			<ejb-name>MailService</ejb-name>
+			<activation-config>
+				<activation-config-property>
+					<activation-config-property-name>destinationType</activation-config-property-name>
+					<activation-config-property-value>javax.jms.Queue</activation-config-property-value>
+				</activation-config-property>
+				<activation-config-property>
+					<activation-config-property-name>destination</activation-config-property-name>
+					<!-- Default WildFly 8.1.0 Example-Queue -->
+					<activation-config-property-value>java:/jms/queue/DLQ</activation-config-property-value>
+				</activation-config-property>
+			</activation-config>
+			<resource-ref>
+				<res-ref-name>MyTestQueue</res-ref-name>
+				<!-- Default WildFly 8.1.0 Example-Queue -->
+				<lookup-name>java:/jms/queue/DLQ</lookup-name>
+			</resource-ref>
+			<resource-ref>
+				<res-ref-name>MyTestEmailSession</res-ref-name>
+				<injection-target>
+					<injection-target-class>org.swa.conf.business.service.MailService</injection-target-class>
+					<injection-target-name>mailSession</injection-target-name>
+				</injection-target>
+				<!-- Default WildFly 8.1.0 Example-MailSession -->
+				<lookup-name>java:jboss/mail/Default</lookup-name>
+			</resource-ref>
+		</message-driven>
+
+	</enterprise-beans>
+
+</ejb-jar>

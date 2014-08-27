@@ -1,0 +1,43 @@
+<ejb-jar xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/ejb-jar_3_2.xsd" version="3.2">
+
+	<enterprise-beans>
+
+		<session>
+			<ejb-name>EnvironmentEntriesHolder</ejb-name>
+			<env-entry>
+				<description>How often in days must user change their password</description>
+				<env-entry-name>passwordChangePeriodInDays</env-entry-name>
+				<env-entry-type>java.lang.Integer</env-entry-type>
+				<env-entry-value>90</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<description>Offset in millis between report run and reminders mass dispatch</description>
+				<env-entry-name>expiredPwdReportToReminderDelay</env-entry-name>
+				<env-entry-type>java.lang.Long</env-entry-type>
+				<env-entry-value>1500</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<description>How long in millis may be reminders being dispatched</description>
+				<env-entry-name>expiredPwdReminderSendingWindow</env-entry-name>
+				<env-entry-type>java.lang.Long</env-entry-type>
+				<env-entry-value>1500</env-entry-value>
+			</env-entry>
+		</session>
+
+		<session>
+			<ejb-name>EventToQueueMediator</ejb-name>
+			<resource-ref>
+				<res-ref-name>MyTestQueue</res-ref-name>
+				<injection-target>
+					<injection-target-class>org.swa.conf.business.service.EventToQueueMediator</injection-target-class>
+					<injection-target-name>queue</injection-target-name>
+				</injection-target>
+				<!-- Default WildFly 8.1.0 Example-Queue -->
+				<lookup-name>java:/jms/queue/DLQ</lookup-name>
+			</resource-ref>
+		</session>
+
+	</enterprise-beans>
+
+</ejb-jar>

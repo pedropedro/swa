@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.swa</groupId>
+		<artifactId>config</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>conference</artifactId>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>../datatypes</module>
+		<module>../management</module>
+		<module>../business</module>
+		<module>../mongo</module>
+		<module>../application</module>
+	</modules>
+
+	<properties>
+		<maven.test.skip>false</maven.test.skip>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<configuration>
+					<skip>${maven.test.skip}</skip>
+					<debug>false</debug>
+					<detail>true</detail>
+					<trace>false</trace>
+					<failOnError>false</failOnError>
+					<effort>Max</effort>
+					<!-- Min, Default, Max -->
+					<threshold>Low</threshold>
+					<!-- High, Default, Low, Ignore -->
+					<excludeFilterFile>${project.parent.basedir}/firebug-exclude.xml</excludeFilterFile>
+					<findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+				</configuration>
+				<executions>
+					<execution>
+						<id>firebug-check</id>
+						<phase>test</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>checkstyle-check</id>
+						<phase>test</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<skip>${maven.test.skip}</skip>
+							<configLocation>checkstyle-checker.xml</configLocation>
+							<consoleOutput>true</consoleOutput>
+							<failsOnError>false</failsOnError>
+							<logViolationsToConsole>false</logViolationsToConsole>
+							<failOnViolation>false</failOnViolation>
+							<includeTestSourceDirectory>false</includeTestSourceDirectory>
+							<violationSeverity>info</violationSeverity>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Remove persistent timers, WildFly has often problems with them => NPE -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>remove-persistent-timers</id>
+						<phase>test</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target unless="maven.test.skip">
+								<echo>Test echo</echo>
+								<!--
+								<echo>Deleting ${JBOSS_HOME}/standalone/data/timer-service-data/*</echo>
+								<delete>
+									<fileset dir="${JBOSS_HOME}/standalone/data/timer-service-data" />
+								</delete>
+								-->
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

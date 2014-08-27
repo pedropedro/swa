@@ -1,0 +1,15 @@
+<ejb-jar xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/ejb-jar_3_2.xsd" version="3.2">
+
+	<enterprise-beans>
+		<session>
+			<ejb-name>EnvironmentEntriesHolder</ejb-name>
+			<env-entry>
+				<description>How often in days must user change their password</description>
+				<env-entry-name>passwordChangePeriodInDays</env-entry-name>
+				<env-entry-type>java.lang.Integer</env-entry-type>
+				<env-entry-value>90</env-entry-value>
+			</env-entry>
+		</session>
+	</enterprise-beans>
+</ejb-jar>

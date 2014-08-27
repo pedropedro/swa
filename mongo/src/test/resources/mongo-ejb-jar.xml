@@ -1,0 +1,36 @@
+<ejb-jar xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/ejb-jar_3_2.xsd" version="3.2">
+
+	<enterprise-beans>
+		<session>
+			<ejb-name>EnvironmentEntriesHolder</ejb-name>
+			<env-entry>
+				<description>Connection string to the mongo server</description>
+				<env-entry-name>connectionStringMongo</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>mongodb://localhost:27017</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<description>Mapping of logical collection names to: 'physical_db_name'.'physical_collection_name'</description>
+				<env-entry-name>collection.location</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>test.location</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<env-entry-name>collection.conference</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>test.conference</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<env-entry-name>collection.speaker</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>test.speaker</env-entry-value>
+			</env-entry>
+			<env-entry>
+				<env-entry-name>collection.user</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>ldap.user</env-entry-value>
+			</env-entry>
+		</session>
+	</enterprise-beans>
+</ejb-jar>

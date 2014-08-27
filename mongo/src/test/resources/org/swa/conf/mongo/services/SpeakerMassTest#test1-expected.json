@@ -1,0 +1,8 @@
+{	"speaker": 
+	[
+		{ "_id":{ "$oid":"000000000000000000000001" }, "name":"name1",     "description":"desc1" },
+		{ "_id":{ "$oid":"000000000000000000000002" }, "name":"name2",     "description":"desc2" },
+		{ "_id":{ "$oid":"000000000000000000000003" }, "name":"name3",     "description":"desc3" },
+		{ "_id":{ "$oid":"000000000000000000000004" }, "name":"Speaker 1", "description":"Speaker description" }
+	]
+}
