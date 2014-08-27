@@ -6,23 +6,20 @@ public abstract class AbstractDatatype implements Serializable, Cloneable {
 
 	private static final long	serialVersionUID	= 1L;
 
-	private Object						_id;
+	private long _id;
 
-	public Object getId() {
+	public long getId() {
 		return _id;
 	}
 
-	public AbstractDatatype setId(final Object id) {
+	public AbstractDatatype setId(final long id) {
 		_id = id;
 		return this;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((_id == null) ? 0 : _id.hashCode());
-		return result;
+		return (int) _id;
 	}
 
 	@Override
@@ -35,11 +32,7 @@ public abstract class AbstractDatatype implements Serializable, Cloneable {
 		if (!(obj instanceof AbstractDatatype))
 			return false;
 		final AbstractDatatype other = (AbstractDatatype) obj;
-		if (_id == null) {
-			if (other._id != null)
-				return false;
-		} else if (!_id.equals(other._id))
-			return false;
-		return true;
+
+		return _id == other._id;
 	}
 }
