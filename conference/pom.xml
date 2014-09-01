@@ -18,6 +18,7 @@
 		<module>../business</module>
 		<module>../mongo</module>
 		<module>../application</module>
+		<module>../conference-client</module>
 	</modules>
 
 	<properties>
