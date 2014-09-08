@@ -1,10 +1,7 @@
 package org.swa.conf.business.service;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.jms.DeliveryMode;
@@ -15,6 +12,11 @@ import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -26,9 +28,6 @@ import org.slf4j.Logger;
 import org.swa.conf.datatypes.AbstractDatatype;
 import org.swa.conf.datatypes.User;
 import org.swa.conf.monitoring.LoggerProducer;
-
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(Arquillian.class)
 public class MailServiceTest {
@@ -48,13 +47,13 @@ public class MailServiceTest {
 	}
 
 	@Inject
-	private Logger			log;
+	private Logger log;
 
 	@Inject
-	private JMSContext	ctx;
+	private JMSContext ctx;
 
 	@Resource(lookup = "java:comp/env/MyTestQueue")
-	private Queue				queue;
+	private Queue queue;
 
 	@Test
 	public void sendMailTest() throws InterruptedException, IOException, MessagingException {

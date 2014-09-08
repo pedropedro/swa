@@ -2,7 +2,6 @@ package org.swa.conf.business.access.rest;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.enterprise.context.ApplicationScoped;
 
 import org.swa.conf.business.access.rest.impl.ConferenceRestServiceBean;

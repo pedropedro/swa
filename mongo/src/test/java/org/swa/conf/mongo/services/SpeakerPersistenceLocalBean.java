@@ -6,4 +6,5 @@ import javax.ejb.Stateless;
 @Stateless
 @LocalBean
 public class SpeakerPersistenceLocalBean extends SpeakerPersistenceBean {
+
 }

@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <arquillian xmlns="http://jboss.org/schema/arquillian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jboss.org/schema/arquillian http://www.jboss.org/schema/arquillian/arquillian_1_0.xsd">
+		xsi:schemaLocation="http://jboss.org/schema/arquillian http://www.jboss.org/schema/arquillian/arquillian_1_0.xsd">
 
-   <!-- Force the use of the Servlet 3.0 protocol with all containers, as it is the most mature -->
-	<defaultProtocol type="Servlet 3.0" />
+	<!-- Force the use of the Servlet 3.0 protocol with all containers, as it is the most mature -->
+	<defaultProtocol type="Servlet 3.0"/>
 
-   <!-- To have test archives exported to the file system for inspection -->
+	<!-- To have test archives exported to the file system for inspection -->
 	<engine>
 		<property name="deploymentExportPath">target/</property>
 	</engine>
 
 
-   <!-- Example configuration for a remote JBoss Enterprise Application Platform 6 or AS 7 instance -->
+	<!-- Example configuration for a remote JBoss Enterprise Application Platform 6 or AS 7 instance -->
 	<container qualifier="wildfly" default="true">
 
-  <!-- By default, arquillian will use the JBOSS_HOME environment variable. -->
-  
-  	<!-- org.wildfly:wildfly-arquillian-container-embedded:8.1.0.CR1 -->
-  	<!-- 
-		<configuration>
-			<property name="username">a</property>
-			<property name="password">a</property>
-			<property name="managementAddress">localhost</property>
-			<property name="managementPort">9990</property>
-			<property name="managementProtocol"></property>
-			<property name="jbossHome">D:\Java\wildfly-8.1.0.CR1</property>
-			<property name="modulePath">D:\Java\wildfly-8.1.0.CR1\modules</property>
-			<property name="bundlePath"></property>
-			<property name="cleanServerBaseDir">true</property>
-		</configuration>
-    -->
-    
-  	<!-- org.wildfly:wildfly-arquillian-container-remote:8.1.0.CR1 -->
-  	<!-- As of JBoss 7.2 EAP we don't need any explicite settings
-		<configuration>
-			<property name="username">a</property>
-			<property name="password">a</property>
-			<property name="managementAddress">localhost</property>
-			<property name="managementPort">9990</property>
-			<property name="managementProtocol">???</property>
-		</configuration>
-    -->
+		<!-- By default, arquillian will use the JBOSS_HOME environment variable. -->
+
+		<!-- org.wildfly:wildfly-arquillian-container-embedded:8.1.0.CR1 -->
+		<!--
+			<configuration>
+				<property name="username">a</property>
+				<property name="password">a</property>
+				<property name="managementAddress">localhost</property>
+				<property name="managementPort">9990</property>
+				<property name="managementProtocol"></property>
+				<property name="jbossHome">D:\Java\wildfly-8.1.0.CR1</property>
+				<property name="modulePath">D:\Java\wildfly-8.1.0.CR1\modules</property>
+				<property name="bundlePath"></property>
+				<property name="cleanServerBaseDir">true</property>
+			</configuration>
+		-->
+
+		<!-- org.wildfly:wildfly-arquillian-container-remote:8.1.0.CR1 -->
+		<!-- As of JBoss 7.2 EAP we don't need any explicite settings
+			<configuration>
+				<property name="username">a</property>
+				<property name="password">a</property>
+				<property name="managementAddress">localhost</property>
+				<property name="managementPort">9990</property>
+				<property name="managementProtocol">???</property>
+			</configuration>
+		-->
 	</container>
 
 </arquillian>

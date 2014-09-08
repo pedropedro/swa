@@ -8,11 +8,12 @@ import java.util.Date;
 public interface StatisticsPersister {
 
 	static class HistogramEntry implements Serializable {
-		private static final long	serialVersionUID	= 1L;
-		Date											start, end;
-		Long											measure;
 
-		@ConstructorProperties({ "start", "end", "measure" })
+		private static final long serialVersionUID = 1L;
+		Date start, end;
+		Long measure;
+
+		@ConstructorProperties({"start", "end", "measure"})
 		public HistogramEntry(final Date start, final Date end, final Long measure) {
 			this.start = start;
 			this.end = end;
@@ -33,9 +34,10 @@ public interface StatisticsPersister {
 	}
 
 	static class PersistentEntry {
-		private final String	key;
-		private final Date		timestamp;
-		private final Long		measure;
+
+		private final String key;
+		private final Date timestamp;
+		private final Long measure;
 
 		public PersistentEntry(final String key, final Date timestamp, final Long measure) {
 			this.key = key;

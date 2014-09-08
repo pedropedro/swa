@@ -2,7 +2,6 @@ package org.swa.conf.mongo.services;
 
 import javax.inject.Inject;
 
-import org.bson.types.ObjectId;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
@@ -24,12 +23,12 @@ public class SpeakerPersistenceBeanTest {
 	}
 
 	@Inject
-	private BasePersistenceService<Speaker>	persistence;
+	private BasePersistenceService<Speaker> persistence;
 
 	@Test
 	@InSequence(value = 10)
 	public void notFound() {
-		final Speaker rec = persistence.findById(new ObjectId("1234567890abcdef12345678"));
+		final Speaker rec = persistence.findById(-1L);
 		Assert.assertNull(rec);
 	}
 
@@ -37,14 +36,15 @@ public class SpeakerPersistenceBeanTest {
 	@InSequence(value = 20)
 	public void crud() {
 
-		final Speaker s = new SpeakerCollection().withOid();
+		final Speaker s = new SpeakerCollection();
+		s.setId(null);
 		s.setDescription("Speaker description");
 		s.setName("Speaker 1");
 
-		Assert.assertNotNull(s.getId());
 
 		// Create
 		persistence.save(s);
+		Assert.assertNotNull(s.getId());
 
 		// Read
 		final Speaker s2 = persistence.findById(s.getId());

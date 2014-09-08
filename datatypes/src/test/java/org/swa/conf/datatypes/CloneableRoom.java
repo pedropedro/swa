@@ -6,10 +6,10 @@ import org.swa.conf.datatypes.validators.Range;
 
 class CloneableRoom extends Room {
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
-	private double						dbl;
-	private AtomicInteger			ai;
+	private double dbl;
+	private AtomicInteger ai;
 
 	@Range(min = "1", max = "10.0", messageScrewed = true)
 	double getDbl() {

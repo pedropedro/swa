@@ -6,10 +6,10 @@ import org.swa.conf.datatypes.validators.Range;
 
 public class Room extends AbstractDatatype {
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
-	private String						name;
-	private Integer						capacity;
+	private String name;
+	private Integer capacity;
 
 	@NotNull
 	public String getName() {

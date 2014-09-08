@@ -4,12 +4,13 @@ import org.swa.conf.datatypes.Conference;
 
 public class ConferenceCollection extends Conference {
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
 	public ConferenceCollection() {
 	}
 
 	public ConferenceCollection(final Conference c) {
+
 		setCity(c.getCity());
 		setDescription(c.getDescription());
 		setFrom(c.getFrom());

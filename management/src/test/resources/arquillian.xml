@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <arquillian xmlns="http://jboss.org/schema/arquillian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jboss.org/schema/arquillian http://www.jboss.org/schema/arquillian/arquillian_1_0.xsd">
+		xsi:schemaLocation="http://jboss.org/schema/arquillian http://www.jboss.org/schema/arquillian/arquillian_1_0.xsd">
 
-   <!-- Force the use of the Servlet 3.0 protocol with all containers, as it is the most mature -->
-	<defaultProtocol type="Servlet 3.0" />
+	<!-- Force the use of the Servlet 3.0 protocol with all containers, as it is the most mature -->
+	<defaultProtocol type="Servlet 3.0"/>
 
-   <!-- To have test archives exported to the file system for inspection -->
+	<!-- To have test archives exported to the file system for inspection -->
 	<engine>
 		<property name="deploymentExportPath">target/</property>
 	</engine>
 
 
-   <!-- Example configuration for a remote JBoss Enterprise Application Platform 6 or AS 7 instance -->
-	<container qualifier="wildfly" default="true" />
+	<!-- Example configuration for a remote JBoss Enterprise Application Platform 6 or AS 7 instance -->
+	<container qualifier="wildfly" default="true"/>
 
 </arquillian>

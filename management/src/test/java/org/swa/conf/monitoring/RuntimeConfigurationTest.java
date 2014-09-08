@@ -1,7 +1,5 @@
 package org.swa.conf.monitoring;
 
-import static org.junit.Assert.*;
-
 import javax.ejb.EJBException;
 import javax.inject.Inject;
 import javax.management.JMX;
@@ -9,6 +7,8 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+
+import static org.junit.Assert.assertEquals;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -38,10 +38,10 @@ public class RuntimeConfigurationTest {
 	}
 
 	@Inject
-	private RuntimeConfigurationMXBean	config;
+	private RuntimeConfigurationMXBean config;
 
 	@Inject
-	private EnvironmentEntriesHolder		eh;
+	private EnvironmentEntriesHolder eh;
 
 	@Test
 	@InSequence(value = 10)
@@ -85,10 +85,12 @@ public class RuntimeConfigurationTest {
 	public void configExternalPasswordChangePeriodInDays() throws Exception {
 
 		// Get a connection to the WildFly 8 MBean server on localhost
-		final String urlString = System.getProperty("jmx.service.url", "service:jmx:http-remoting-jmx://localhost:9990");
-		final JMXConnector jmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(urlString), null);
+		final String urlString = System.getProperty("jmx.service.url",
+				"service:jmx:http-remoting-jmx://localhost:9990");
 
-		try {
+		try (
+				JMXConnector jmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(urlString), null)
+		) {
 			final MBeanServerConnection connection = jmxConnector.getMBeanServerConnection();
 
 			final RuntimeConfigurationMXBean mbean = JMX.newMXBeanProxy(connection, RuntimeConfiguration.MBEAN_NAME,
@@ -100,9 +102,6 @@ public class RuntimeConfigurationTest {
 			mbean.setPasswordChangePeriodInDays(Integer.valueOf(200));
 
 			assertEquals(Integer.valueOf(200), mbean.getPasswordChangePeriodInDays());
-
-		} finally {
-			jmxConnector.close();
 		}
 	}
 }

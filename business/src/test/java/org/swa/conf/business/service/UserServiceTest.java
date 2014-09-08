@@ -1,8 +1,8 @@
 package org.swa.conf.business.service;
 
-import static org.junit.Assert.*;
-
 import javax.inject.Inject;
+
+import static org.junit.Assert.*;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -31,7 +31,7 @@ public class UserServiceTest {
 	}
 
 	@Inject
-	private UserService	s;
+	private UserService s;
 
 	@Test
 	@InSequence(value = 10)

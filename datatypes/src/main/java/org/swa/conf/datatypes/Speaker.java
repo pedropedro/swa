@@ -7,12 +7,12 @@ import org.swa.conf.datatypes.validators.Email;
 
 public class Speaker extends AbstractDatatype {
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
-	private String						name;
-	private String						description;
-	private String						email;
-	private User							user;
+	private String name;
+	private String description;
+	private String email;
+	private User user;
 
 	@NotNull
 	public String getName() {

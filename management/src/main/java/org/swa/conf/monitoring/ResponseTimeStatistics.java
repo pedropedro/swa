@@ -12,7 +12,7 @@ import javax.interceptor.InvocationContext;
 public class ResponseTimeStatistics {
 
 	@Inject
-	private MonitoringResource	monitor;
+	private MonitoringResource monitor;
 
 	@AroundInvoke
 	public Object getResponseTime(final InvocationContext ctx) throws Exception {

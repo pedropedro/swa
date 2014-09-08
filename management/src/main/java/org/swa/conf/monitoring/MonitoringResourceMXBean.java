@@ -1,7 +1,6 @@
 package org.swa.conf.monitoring;
 
 import java.util.Date;
-
 import javax.ejb.Remote;
 
 import org.swa.conf.monitoring.StatisticsPersister.HistogramEntry;
@@ -20,6 +19,7 @@ public interface MonitoringResourceMXBean {
 
 			@DisplayName("... time window to") Date to,
 
-			@DisplayName("How coarse to aggregate ? Format: <integer>[D|H|M] (for Day, Hour, Minute)") String coarseness);
+			@DisplayName("How coarse to aggregate ? Format: <integer>[D|H|M] (for Day, Hour, " +
+					"Minute)") String coarseness);
 
 }

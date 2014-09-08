@@ -18,7 +18,7 @@ public class SpeakerPersistenceBean extends BasePersistenceBean<Speaker> {
 
 	@Inject
 	@NamedCollection(logicalName = "speaker")
-	private MongoCollection	c;
+	private MongoCollection c;
 
 	@Override
 	public MongoCollection getCollection() {
@@ -29,6 +29,6 @@ public class SpeakerPersistenceBean extends BasePersistenceBean<Speaker> {
 	@Override
 	@PostConstruct
 	protected void setGenericClass() {
-		this.setGenericClass(SpeakerCollection.class);
+		setGenericClass(SpeakerCollection.class);
 	}
 }

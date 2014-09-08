@@ -1,10 +1,9 @@
 package org.swa.conf.mongo.services;
 
-import static org.junit.Assert.*;
-
 import javax.inject.Inject;
 
-import org.bson.types.ObjectId;
+import static org.junit.Assert.*;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
@@ -25,12 +24,12 @@ public class UserPersistenceBeanTest {
 	}
 
 	@Inject
-	private BasePersistenceService<User>	persistence;
+	private BasePersistenceService<User> persistence;
 
 	@Test
 	@InSequence(value = 10)
 	public void notFound() {
-		final User rec = persistence.findById(new ObjectId("1234567890abcdef12345678"));
+		final User rec = persistence.findById(-1L);
 		assertNull(rec);
 	}
 
@@ -38,14 +37,14 @@ public class UserPersistenceBeanTest {
 	@InSequence(value = 20)
 	public void crud() {
 
-		final UserCollection s = new UserCollection().withOid();
+		final UserCollection s = new UserCollection();
+		s.setId(null);
 		s.setPassword("password");
 		s.setName("User 1");
 
-		assertNotNull(s.getId());
-
 		// Create
 		persistence.save(s);
+		assertNotNull(s.getId());
 
 		// Read
 		final User s2 = persistence.findById(s.getId());

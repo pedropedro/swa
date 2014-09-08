@@ -1,7 +1,6 @@
 package org.swa.conf.datatypes;
 
 import java.util.Date;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
@@ -10,12 +9,12 @@ import org.swa.conf.datatypes.validators.Email;
 
 public class User extends AbstractDatatype {
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
-	private String						name;
-	private String						password;
-	private Date							lastPasswordChange;
-	private String						email;
+	private String name;
+	private String password;
+	private Date lastPasswordChange;
+	private String email;
 
 	@NotNull
 	public String getName() {

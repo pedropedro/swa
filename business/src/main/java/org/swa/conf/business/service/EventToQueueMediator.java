@@ -15,16 +15,16 @@ import org.swa.conf.configuration.EnvironmentEntriesHolder;
 public class EventToQueueMediator {
 
 	@Inject
-	private Logger										log;
+	private Logger log;
 
 	@Inject
-	private JMSContext								ctx;
+	private JMSContext ctx;
 
 	/** Configured in ejb-jar.xml */
-	private Queue											queue;
+	private Queue queue;
 
 	@Inject
-	private EnvironmentEntriesHolder	props;
+	private EnvironmentEntriesHolder props;
 
 	public void receiver(@Observes final PasswordExpiredEvent e) {
 
@@ -34,14 +34,14 @@ public class EventToQueueMediator {
 		log.debug("Received user {} in {}", e.getUser(), this);
 
 		// User with expired passwords will be reminded daily -> but please not 2 or more reminder clustered in case
-		// our JMS system crashed in between => let the reminders expire when not sent until xxxH after they should have
-		// been sent.
+		// our JMS system crashed in between => let the reminders expire when not sent until xxxH after they should
+		// have been sent.
 		final long startSendReminders = props.getLong("expiredPwdReportToReminderDelay");
 		final long stopSendReminders = props.getLong("expiredPwdReminderSendingWindow");
 
 		// persistent message per default
 		ctx.createProducer().setDeliveryDelay(startSendReminders).setTimeToLive(startSendReminders + stopSendReminders)
-		.setPriority(6).send(queue, e.getUser());
+				.setPriority(6).send(queue, e.getUser());
 	}
 
 	@PostConstruct

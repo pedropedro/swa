@@ -4,35 +4,36 @@ import java.io.Serializable;
 
 public abstract class AbstractDatatype implements Serializable, Cloneable {
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
-	private long _id;
+	private Long _id;
 
-	public long getId() {
+	public Long getId() {
 		return _id;
 	}
 
-	public AbstractDatatype setId(final long id) {
+	public AbstractDatatype setId(final Long id) {
 		_id = id;
 		return this;
 	}
 
 	@Override
 	public int hashCode() {
-		return (int) _id;
+		return _id == null ? 31 : _id.hashCode();
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		// Intentionally NOT getClass() comparison
-		if (!(obj instanceof AbstractDatatype))
-			return false;
-		final AbstractDatatype other = (AbstractDatatype) obj;
+	public boolean equals(final Object o) {
 
-		return _id == other._id;
+		if (this == o) return true;
+
+		// Intentionally NOT getClass() comparison
+		if (!(o instanceof AbstractDatatype)) return false;
+
+		final AbstractDatatype that = (AbstractDatatype) o;
+
+		if (_id != null ? !_id.equals(that._id) : that._id != null) return false;
+
+		return true;
 	}
 }

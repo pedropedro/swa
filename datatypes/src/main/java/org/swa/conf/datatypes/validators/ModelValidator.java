@@ -1,22 +1,20 @@
 package org.swa.conf.datatypes.validators;
 
 import java.util.Set;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 /**
- * Wrapper for a {@link javax.validation.Validator Validator} transforming its set of
- * {@link javax.validation.ConstraintViolation ConstraintViolations} to an Exception with aggregated violations
- * messages.
+ * Wrapper for a {@link javax.validation.Validator Validator} transforming its set of {@link
+ * javax.validation.ConstraintViolation ConstraintViolations} to an Exception with aggregated violations messages.
  */
 @ApplicationScoped
 public class ModelValidator {
 
 	@Inject
-	protected Validator	validator;
+	protected Validator validator;
 
 	public void validate(final Object o, final Class<?>... groups) throws ValidationException {
 

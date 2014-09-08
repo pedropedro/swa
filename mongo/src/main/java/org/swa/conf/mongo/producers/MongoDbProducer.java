@@ -1,7 +1,6 @@
 package org.swa.conf.mongo.producers;
 
 import java.net.UnknownHostException;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Disposes;
@@ -9,21 +8,20 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.swa.conf.configuration.EnvironmentEntriesHolder;
-
 import com.mongodb.Mongo;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
+import org.slf4j.Logger;
+import org.swa.conf.configuration.EnvironmentEntriesHolder;
 
 @ApplicationScoped
 class MongoDbProducer {
 
 	@Inject
-	private Logger										log;
+	private Logger log;
 
 	@Inject
-	private EnvironmentEntriesHolder	entryHolder;
+	private EnvironmentEntriesHolder entryHolder;
 
 	void close(@Disposes final Mongo mongoClient) {
 		log.debug("Closing {}", mongoClient);

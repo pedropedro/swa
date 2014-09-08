@@ -1,7 +1,6 @@
 package org.swa.conf.business.service;
 
 import java.util.List;
-
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -13,12 +12,12 @@ import org.swa.conf.datatypes.Conference;
 public class ConferenceService {
 
 	@Inject
-	private Logger															log;
+	private Logger log;
 
 	@Inject
-	private BasePersistenceService<Conference>	persistence;
+	private BasePersistenceService<Conference> persistence;
 
-	public Conference findById(final Object id) {
+	public Conference findById(final Long id) {
 		log.debug("Searching Conference by id {}", id);
 		return persistence.findById(id);
 	}
@@ -35,11 +34,11 @@ public class ConferenceService {
 		remove(t.getId());
 	}
 
-	public void remove(final Object id) {
+	public void remove(final Long id) {
 		persistence.remove(id);
 	}
 
-	public boolean exist(final Object id) {
+	public boolean exist(final Long id) {
 		return persistence.exist(id);
 	}
 }

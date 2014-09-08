@@ -11,12 +11,12 @@ import org.swa.conf.monitoring.LoggerProducer;
 
 public class ArchiveProducer {
 
-	public static final String						APP		= "business-ejb";
+	public static final String APP = "business-ejb";
 
-	public static PomEquippedResolveStage	pers	= Maven.configureResolver().workOffline().loadPomFromFile("pom.xml");
+	public static PomEquippedResolveStage pers = Maven.configureResolver().workOffline().loadPomFromFile("pom.xml");
 
 	public static WebArchive createTestWebArchive() {
-		final WebArchive war = ShrinkWrap.create(WebArchive.class, ArchiveProducer.APP + ".war");
+		final WebArchive war = ShrinkWrap.create(WebArchive.class, APP + ".war");
 		war.addPackage(AbstractDatatype.class.getPackage());
 		war.addPackage(BasePersistenceService.class.getPackage());
 		war.addClass(EnvironmentEntriesHolder.class);

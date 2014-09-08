@@ -1,7 +1,6 @@
 package org.swa.conf.business.access.rest.impl;
 
 import java.util.List;
-
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Application;
@@ -14,6 +13,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.slf4j.Logger;
 import org.swa.conf.business.access.rest.ConferenceRestService;
+import org.swa.conf.business.access.rest.StringToLong;
 import org.swa.conf.business.service.ConferenceService;
 import org.swa.conf.datatypes.Conference;
 import org.swa.conf.datatypes.validators.ModelValidator;
@@ -23,22 +23,22 @@ import org.swa.conf.datatypes.validators.ValidationException;
 public class ConferenceRestServiceBean implements ConferenceRestService {
 
 	@Inject
-	private Logger						log;
+	private Logger log;
 
 	@Context
-	private UriInfo						ctx;
+	private UriInfo ctx;
 
 	@Context
-	private Application				app;
+	private Application app;
 
 	@Context
-	private SecurityContext		sec;
+	private SecurityContext sec;
 
 	@Inject
-	private ConferenceService	s;
+	private ConferenceService s;
 
 	@Inject
-	private ModelValidator		v;
+	private ModelValidator v;
 
 	@Override
 	public List<Conference> getAll() {
@@ -47,32 +47,42 @@ public class ConferenceRestServiceBean implements ConferenceRestService {
 	}
 
 	@Override
-	public Response getOne(final String id) {
+	public Response getOne(final String _id) {
 
-		log.debug("getOne id:{}", id);
+		log.debug("getOne id:{}", _id);
+		final Long id = StringToLong.decode(_id);
 
-		final Conference c = s.findById(id);
+		if (id != null) {
+			final Conference c = s.findById(id);
 
-		if (c != null)
-			return Response.ok().entity(c).links(getParentLink(), getSelfLink(id)).build();
-
+			if (c != null)
+				return Response.ok().entity(c).links(getParentLink(), getSelfLink(id)).build();
+		}
 		return Response.status(Response.Status.NOT_FOUND).links(getParentLink()).build();
 	}
 
 	@Override
-	public Response delete(final String id) {
-		log.debug("delete id:{}", id);
-		s.remove(id);
+	public Response delete(final String _id) {
+
+		log.debug("delete id:{}", _id);
+		final Long id = StringToLong.decode(_id);
+
+		if (id != null)
+			s.remove(id);
+
 		return Response.ok().links(getParentLink()).build();
 	}
 
 	@Override
-	public Response save(final String id, final Conference c) {
-		if (id.equals(c.getId().toString()))
+	public Response save(final String _id, final Conference c) {
+
+		final Long id = StringToLong.decode(_id);
+
+		if (id != null && id.equals(c.getId()))
 			return save(c);
 		else
 			return Response.status(Response.Status.BAD_REQUEST).links(getParentLink())
-					.entity("ID in path :" + id + " and from entity :" + c.getId().toString() + " doesn't match").build();
+					.entity("ID in path :" + id + " and from entity :" + c.getId() + " doesn't match").build();
 	}
 
 	@Override
@@ -86,19 +96,22 @@ public class ConferenceRestServiceBean implements ConferenceRestService {
 
 		final Conference saved = s.save(c);
 
-		final Link self = getSelfLink(saved.getId().toString());
+		final Link self = getSelfLink(saved.getId());
 		return Response.status(Response.Status.CREATED).location(self.getUri()).links(self).build();
 	}
 
 	@Override
-	public Response exist(final String id) {
+	public Response exist(final String _id) {
+
+		final Long id = StringToLong.decode(_id);
+
 		return Response.status(s.exist(id) ? Response.Status.OK : Response.Status.GONE).build();
 	}
 
 	// ------------------------------------------------------------
 	// HATEOAS - propose the client little navigation possibilities
 	// ------------------------------------------------------------
-	private Link getSelfLink(final String id) {
+	private Link getSelfLink(final Long id) {
 		return Link.fromPath(ctx.getBaseUri().getPath() + ConferenceRestService.PATH_COLLECTION + "/" + id).rel("self")
 				.type(MediaType.APPLICATION_JSON).build();
 	}

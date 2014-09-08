@@ -2,58 +2,64 @@
 <!-- Declares the root element that allows behavior to be modified through Angular custom HTML tags. -->
 <html ng-app="ConferenceApp">
 <head>
-<title>SWA Angular test</title>
-<script src="lib/angular.js" type="text/javascript"></script>
-<script src="lib/angular-resource.js" type="text/javascript"></script>
-<script src="lib/angular-route.js" type="text/javascript"></script>
-<script src="lib/date-format.js" type="text/javascript"></script>
-<script src="script/conference.js" type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<title>SWA Angular test</title>
+	<script src="lib/angular.js" type="text/javascript"></script>
+	<script src="lib/angular-resource.js" type="text/javascript"></script>
+	<script src="lib/angular-route.js" type="text/javascript"></script>
+	<script src="lib/date-format.js" type="text/javascript"></script>
+	<script src="script/conference.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
 
 <body ng-controller="ConferenceCtrl">
-	<div>
-		<h4>Conferences</h4>
-		<button ng-click="getAllConferences()">Refresh</button>
+<div>
+	<h4>Conferences</h4>
+	<button ng-click="getAllConferences()">Refresh</button>
 
-		<div>
-			<table class="table table-striped">
-				<tr>
-					<th>Name</th>
-					<th>Description</th>
-					<th>From</th>
-					<th>To</th>
-					<th>Location</th>
-					<th>ID</th>
-					<th />
-					<th />
-				</tr>
-				<tr>
-					<td><input id="in.name" type="text" placeholder="Add conference name ..."
-						ng-model="data.currentConference.name" /></td>
-					<td><input id="in.description" type="text" placeholder="Add description"
-						ng-model="data.currentConference.description" /></td>
-					<td><input id="in.from" type="text" size="10" pattern="\d{4}\-\d{1,2}\-\d{1,2}" class="datepicker"
-						placeholder="Date from" ng-model="data.currentConference.from" /></td>
-					<td><input id="in.to" type="text" size="10" pattern="\d{4}\-\d{1,2}\-\d{1,2}" class="datepicker"
-						placeholder="Date to" ng-model="data.currentConference.to" /></td>
-					<td />
-					<td><input id="in.id" type="text" disabled="disabled" ng-model="data.currentConference.id" /></td>
-					<td><button ng-click="saveConference()">add</button></td>
-					<td />
-				</tr>
-				<tr ng-repeat="conf in data.conferences" id="{{conf.id}}">
-					<td>{{conf.name}}</td>
-					<td>{{conf.description}}</td>
-					<td>{{conf.from | date:'yyyy-MM-dd'}}</td>
-					<td>{{conf.to | date:'yyyy-MM-dd'}}</td>
-					<td>{{conf.location}}</td>
-					<td>{{conf.id}}</td>
-					<td><button ng-click="editConference(conf.id)">edit</button></td>
-					<td><button ng-click="removeConference(conf.id)">remove</button></td>
-				</tr>
-			</table>
-		</div>
+	<div>
+		<table class="table table-striped">
+			<tr>
+				<th>Name</th>
+				<th>Description</th>
+				<th>From</th>
+				<th>To</th>
+				<th>Location</th>
+				<th>ID</th>
+				<th />
+				<th />
+			</tr>
+			<tr>
+				<td><input id="in.name" type="text" placeholder="Add conference name ..."
+						   ng-model="data.currentConference.name" /></td>
+				<td><input id="in.description" type="text" placeholder="Add description"
+						   ng-model="data.currentConference.description" /></td>
+				<td><input id="in.from" type="text" size="10" pattern="\d{4}\-\d{1,2}\-\d{1,2}" class="datepicker"
+						   placeholder="Date from" ng-model="data.currentConference.from" /></td>
+				<td><input id="in.to" type="text" size="10" pattern="\d{4}\-\d{1,2}\-\d{1,2}" class="datepicker"
+						   placeholder="Date to" ng-model="data.currentConference.to" /></td>
+				<td />
+				<td><input id="in.id" type="text" disabled="disabled" ng-model="data.currentConference.id" /></td>
+				<td>
+					<button ng-click="saveConference()">add</button>
+				</td>
+				<td />
+			</tr>
+			<tr ng-repeat="conf in data.conferences" id="{{conf.id}}">
+				<td>{{conf.name}}</td>
+				<td>{{conf.description}}</td>
+				<td>{{conf.from | date:'yyyy-MM-dd'}}</td>
+				<td>{{conf.to | date:'yyyy-MM-dd'}}</td>
+				<td>{{conf.location}}</td>
+				<td>{{conf.id}}</td>
+				<td>
+					<button ng-click="editConference(conf.id)">edit</button>
+				</td>
+				<td>
+					<button ng-click="removeConference(conf.id)">remove</button>
+				</td>
+			</tr>
+		</table>
 	</div>
+</div>
 </body>
 </html>

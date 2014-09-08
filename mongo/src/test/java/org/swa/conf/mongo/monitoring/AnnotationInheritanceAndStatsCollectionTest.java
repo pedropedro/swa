@@ -1,10 +1,9 @@
 package org.swa.conf.mongo.monitoring;
 
-import static org.junit.Assert.*;
-
 import javax.inject.Inject;
 
-import org.bson.types.ObjectId;
+import static org.junit.Assert.*;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
@@ -19,8 +18,7 @@ import org.swa.conf.configuration.EnvironmentEntriesHolder;
 import org.swa.conf.datatypes.User;
 import org.swa.conf.mongo.producers.ArchiveProducer;
 import org.swa.conf.monitoring.MonitoringResource;
-import org.swa.conf.monitoring.StatisticsPersister.HistogramEntry;
-import org.swa.conf.monitoring.StatisticsPersister.StatType;
+import org.swa.conf.monitoring.StatisticsPersister;
 
 @RunWith(Arquillian.class)
 public class AnnotationInheritanceAndStatsCollectionTest {
@@ -43,13 +41,13 @@ public class AnnotationInheritanceAndStatsCollectionTest {
 	}
 
 	@Inject
-	private Logger												log;
+	private Logger log;
 
 	@Inject
-	private MonitoringResource						monitor;
+	private MonitoringResource monitor;
 
 	@Inject
-	private BasePersistenceService<User>	userService;
+	private BasePersistenceService<User> userService;
 
 	@Test
 	@InSequence(value = 10)
@@ -58,20 +56,21 @@ public class AnnotationInheritanceAndStatsCollectionTest {
 		final int loops = 50;
 
 		for (int i = 0; i < loops; i++) {
-			final User rec = userService.findById(new ObjectId("1234567890abcdef12345678"));
+			final User rec = userService.findById(-1L);
 			assertNull(rec);
 		}
 
-		HistogramEntry[] histogram = monitor.getHistogram(StatType.EXCEPTIONS.name(), ".*", null, null, "1H");
+		StatisticsPersister.HistogramEntry[] histogram = monitor.getHistogram(StatisticsPersister.StatType.EXCEPTIONS
+				.name(), ".*", null, null, "1H");
 		assertEquals(1, histogram.length);
 		assertEquals(Long.valueOf(0), histogram[0].getMeasure());
 
 		// If @Inherited in @StatisticsSource didn't work, we'd get here 0 (no interceptor bound occurred)
-		histogram = monitor.getHistogram(StatType.INVOCATIONS.name(), ".*", null, null, "1H");
+		histogram = monitor.getHistogram(StatisticsPersister.StatType.INVOCATIONS.name(), ".*", null, null, "1H");
 		assertEquals(1, histogram.length);
 		assertEquals(Long.valueOf(loops), histogram[0].getMeasure());
 
-		histogram = monitor.getHistogram(StatType.RESPONSES.name(), ".*", null, null, "1H");
+		histogram = monitor.getHistogram(StatisticsPersister.StatType.RESPONSES.name(), ".*", null, null, "1H");
 		assertEquals(1, histogram.length);
 		log.debug("Response time: {} ms", histogram[0].getMeasure());
 		assertTrue(histogram[0].getMeasure() >= loops);

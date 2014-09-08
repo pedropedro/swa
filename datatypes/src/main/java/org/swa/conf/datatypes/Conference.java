@@ -2,21 +2,20 @@ package org.swa.conf.datatypes;
 
 import java.util.Date;
 import java.util.List;
-
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
 public class Conference extends AbstractDatatype {
 
-	private static final long			serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
-	private String								name;
-	private String								description;
-	private Date									from;
-	private Date									to;
-	private Location							city;
-	private List<? extends Talk>	talks;
+	private String name;
+	private String description;
+	private Date from;
+	private Date to;
+	private Location city;
+	private List<? extends Talk> talks;
 
 	/** Cross-property validation - check the visibility !!! */
 	@AssertTrue(message = "{invalid.time-interval}")

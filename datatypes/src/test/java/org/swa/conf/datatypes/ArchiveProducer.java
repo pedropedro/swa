@@ -7,7 +7,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
 
 public class ArchiveProducer {
 
-	public static PomEquippedResolveStage	pers	= Maven.configureResolver().workOffline().loadPomFromFile("pom.xml");
+	public static PomEquippedResolveStage pers = Maven.configureResolver().workOffline().loadPomFromFile("pom.xml");
 
 	public static WebArchive createTestArchive() {
 		final WebArchive war = ShrinkWrap.create(WebArchive.class, "datatypes-ejb.war");

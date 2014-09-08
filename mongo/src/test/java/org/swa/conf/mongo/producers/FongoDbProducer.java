@@ -5,17 +5,16 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.Specializes;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-
 import com.github.fakemongo.Fongo;
 import com.mongodb.Mongo;
+import org.slf4j.Logger;
 
 @Specializes
 @ApplicationScoped
 public class FongoDbProducer extends MongoDbProducer {
 
 	@Inject
-	private Logger	log;
+	private Logger log;
 
 	@Override
 	@Produces

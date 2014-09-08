@@ -17,23 +17,23 @@ import org.swa.conf.datatypes.User;
 @Stateless
 public class MaintenanceService {
 
-	private final long										DAY_IN_MILLIS	= 24l * 60l * 60l * 1000l;
+	private final long DAY_IN_MILLIS = 24L * 60L * 60L * 1000L;
 
 	@Inject
-	private Logger												log;
+	private Logger log;
 
 	@Inject
-	private BasePersistenceService<User>	persistence;
+	private BasePersistenceService<User> persistence;
 
 	@Inject
-	private Event<PasswordExpiredEvent>		event;
+	private Event<PasswordExpiredEvent> event;
 
 	@Inject
 	@TimerId("generateReportForExpiredPasswords")
-	private Event<TimerFiredEvent>				timerEvent;
+	private Event<TimerFiredEvent> timerEvent;
 
 	@Inject
-	private EnvironmentEntriesHolder			props;
+	private EnvironmentEntriesHolder props;
 
 	@Schedule(hour = "03", minute = "16")
 	public void generateReportForExpiredPasswords(final Timer t) {
@@ -54,6 +54,6 @@ public class MaintenanceService {
 	public boolean hasExpiredPassword(final User u) {
 		return u.getLastPasswordChange() == null
 				|| System.currentTimeMillis() - u.getLastPasswordChange().getTime() > DAY_IN_MILLIS
-						* props.getInteger(props.ENV_passwordChangePeriodInDays).longValue();
+				* props.getInteger(props.ENV_passwordChangePeriodInDays).longValue();
 	}
 }

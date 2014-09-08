@@ -1,7 +1,6 @@
 package org.swa.conf.business.service;
 
 import java.util.Date;
-
 import javax.annotation.Resource;
 import javax.ejb.MessageDriven;
 import javax.ejb.MessageDrivenContext;
@@ -20,13 +19,13 @@ import org.swa.conf.datatypes.User;
 public class MailService implements javax.jms.MessageListener {
 
 	@Inject
-	private Logger								log;
+	private Logger log;
 
 	@Resource
-	private MessageDrivenContext	mdCtx;
+	private MessageDrivenContext mdCtx;
 
 	/** Configured in ejb-jar.xml */
-	private javax.mail.Session		mailSession;
+	private javax.mail.Session mailSession;
 
 	@Override
 	public void onMessage(final javax.jms.Message m) {
@@ -43,7 +42,8 @@ public class MailService implements javax.jms.MessageListener {
 			eMail.setRecipients(
 					RecipientType.TO,
 					InternetAddress.parse(
-							user.getEmail() == null || user.getEmail().isEmpty() ? "test@test.org" : user.getEmail(), false));
+							user.getEmail() == null || user.getEmail().isEmpty() ? "test@test.org" : user.getEmail(),
+							false));
 			eMail.setSubject("Your password has expired");
 			eMail.setHeader("X-Mailer", "JavaMail");
 			eMail.setText("TEST");
@@ -57,11 +57,10 @@ public class MailService implements javax.jms.MessageListener {
 			log.warn("Error in sending e-mail: {}", e.getMessage());
 
 			try {
-
 				if (m.getJMSRedelivered() == false)
 					mdCtx.setRollbackOnly();
 				else
-					log.warn("Tried again to proces message");
+					log.warn("Tried again to process message");
 
 			} catch (IllegalStateException | JMSException e2) {
 				log.warn("Cannot rollback message consumption: {}", e2.getMessage());

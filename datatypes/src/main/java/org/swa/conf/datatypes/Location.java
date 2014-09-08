@@ -2,7 +2,6 @@ package org.swa.conf.datatypes;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.validation.constraints.NotNull;
 
 import org.swa.conf.datatypes.validators.GeoLatitude;
@@ -10,13 +9,13 @@ import org.swa.conf.datatypes.validators.GeoLongitude;
 
 public class Location extends AbstractDatatype {
 
-	private static final long			serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
-	private String								city;
-	private String								street;
-	private Double								latitude;
-	private Double								longitude;
-	private List<? extends Room>	rooms;
+	private String city;
+	private String street;
+	private Double latitude;
+	private Double longitude;
+	private List<? extends Room> rooms;
 
 	@NotNull
 	public String getCity() {
@@ -34,8 +33,7 @@ public class Location extends AbstractDatatype {
 	}
 
 	@GeoLongitude
-	@/** just for test'n'fun */
-	NotNull
+	@/* just for test'n'fun */NotNull
 	public Double getLongitude() {
 		return longitude;
 	}

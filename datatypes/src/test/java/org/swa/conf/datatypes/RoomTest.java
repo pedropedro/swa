@@ -1,11 +1,11 @@
 package org.swa.conf.datatypes;
 
-import static org.junit.Assert.*;
-
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.inject.Inject;
 import javax.validation.ValidationException;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -23,7 +23,7 @@ public class RoomTest {
 	}
 
 	@Inject
-	private ModelValidator	validator;
+	private ModelValidator validator;
 
 	@Test
 	public void rangeTest() {
@@ -40,14 +40,16 @@ public class RoomTest {
 			validator.validate(r.clone().setCapacity(4));
 			fail("Expected validation exception");
 		} catch (final ValidationException e) {
-			assertTrue(e.getMessage(), e.getMessage().endsWith("\n" + "room.capacity: value must be within range 5 to 1000"));
+			assertTrue(e.getMessage(), e.getMessage().endsWith("\n" + "room.capacity: value must be within range 5 " +
+					"to 1000"));
 			validator.validate(r.clone().setCapacity(1000));
 		}
 		try {
 			validator.validate(r.clone().setCapacity(1001));
 			fail("Expected validation exception");
 		} catch (final ValidationException e) {
-			assertTrue(e.getMessage(), e.getMessage().endsWith("\n" + "room.capacity: value must be within range 5 to 1000"));
+			assertTrue(e.getMessage(), e.getMessage().endsWith("\n" + "room.capacity: value must be within range 5 " +
+					"to 1000"));
 		}
 		try {
 			validator.validate(r.clone().setCapacity(null));

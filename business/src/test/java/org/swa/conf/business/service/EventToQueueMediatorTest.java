@@ -1,16 +1,16 @@
 package org.swa.conf.business.service;
 
-import static org.junit.Assert.*;
-
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Resource;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.jms.JMSConsumer;
 import javax.jms.JMSContext;
 import javax.jms.Queue;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -38,19 +38,19 @@ public class EventToQueueMediatorTest {
 	}
 
 	@Inject
-	private Logger											log;
+	private Logger log;
 
 	@Inject
-	private Event<PasswordExpiredEvent>	event;
+	private Event<PasswordExpiredEvent> event;
 
 	@Inject
-	private JMSContext									ctx;
+	private JMSContext ctx;
 
 	@Resource(lookup = "java:comp/env/MyTestQueue")
-	private Queue												queue;
+	private Queue queue;
 
 	@Inject
-	private EnvironmentEntriesHolder		props;
+	private EnvironmentEntriesHolder props;
 
 	@Test
 	public void delayedWindowedQueueTest() throws InterruptedException {

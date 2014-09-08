@@ -3,10 +3,8 @@ package org.swa.conf.mongo.services;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.inject.Inject;
 
-import org.bson.types.ObjectId;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
@@ -33,12 +31,12 @@ public class ConferencePersistenceBeanTest {
 	}
 
 	@Inject
-	private BasePersistenceService<Conference>	persistence;
+	private BasePersistenceService<Conference> persistence;
 
 	@Test
 	@InSequence(value = 10)
 	public void notFound() {
-		final Conference rec = persistence.findById(new ObjectId("1234567890abcdef12345678"));
+		final Conference rec = persistence.findById(-1L);
 		Assert.assertNull(rec);
 	}
 
@@ -47,23 +45,27 @@ public class ConferencePersistenceBeanTest {
 	public void crud() {
 
 		final List<RoomCollection> rooms = new ArrayList<>();
-		RoomCollection r = new RoomCollection().withOid();
+		RoomCollection r = new RoomCollection();
+		r.setId(1L);
 		r.setName("R1");
 		r.setCapacity(100);
 		rooms.add(r);
-		r = new RoomCollection().withOid();
+		r = new RoomCollection();
+		r.setId(2L);
 		r.setName("R22");
 		r.setCapacity(500);
 		rooms.add(r);
 
 		final List<SpeakerCollection> speakers = new ArrayList<>();
-		final SpeakerCollection s = new SpeakerCollection().withOid();
+		final SpeakerCollection s = new SpeakerCollection();
+		s.setId(1L);
 		s.setDescription("Speaker description");
 		s.setName("Speaker 1");
 		speakers.add(s);
 
 		final List<TalkCollection> talks = new ArrayList<>();
-		final TalkCollection t = new TalkCollection().withOid();
+		final TalkCollection t = new TalkCollection();
+		t.setId(1L);
 		t.setFrom(new Date());
 		t.setName("Talk name");
 		t.setRooms(rooms);
@@ -72,14 +74,16 @@ public class ConferencePersistenceBeanTest {
 		t.setTo(new Date());
 		talks.add(t);
 
-		final LocationCollection l = new LocationCollection().withOid();
+		final LocationCollection l = new LocationCollection();
+		l.setId(1L);
 		l.setCity("Sin");
 		l.setLatitude(66.66);
 		l.setLongitude(6.6);
 		l.setStreet("Abc Str");
 		l.setRooms(rooms);
 
-		final ConferenceCollection c = new ConferenceCollection().withOid();
+		final ConferenceCollection c = new ConferenceCollection();
+		c.setId(null);
 		c.setCity(l);
 		c.setDescription("Conference description");
 		c.setFrom(new Date());
@@ -87,7 +91,6 @@ public class ConferencePersistenceBeanTest {
 		c.setTalks(talks);
 		c.setTo(new Date());
 
-		Assert.assertNotNull(c.getId());
 		Assert.assertNotNull(c.getCity().getId());
 		for (final org.swa.conf.datatypes.Talk tt : c.getTalks()) {
 			Assert.assertNotNull(tt.getId());
@@ -99,6 +102,7 @@ public class ConferencePersistenceBeanTest {
 
 		// Create
 		persistence.save(c);
+		Assert.assertNotNull(c.getId());
 
 		// Read
 		final Conference c2 = persistence.findById(c.getId());
@@ -106,7 +110,7 @@ public class ConferencePersistenceBeanTest {
 		Assert.assertEquals(c, c2);
 
 		// Update
-		c.setTo(new Date(0l));
+		c.setTo(new Date(0L));
 		persistence.save(c);
 
 		final Conference c3 = persistence.findById(c.getId());

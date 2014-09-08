@@ -5,7 +5,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
@@ -15,8 +14,8 @@ import javax.validation.constraints.Pattern;
 		+ "@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
 @Constraint(validatedBy = {})
 @Documented
-@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
-	ElementType.PARAMETER, ElementType.LOCAL_VARIABLE })
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
+		ElementType.PARAMETER, ElementType.LOCAL_VARIABLE})
 @Retention(RetentionPolicy.RUNTIME)
 @ReportAsSingleViolation
 public @interface Email {
@@ -27,11 +26,12 @@ public @interface Email {
 
 	Class<? extends Payload>[] payload() default {};
 
-	@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
-		ElementType.PARAMETER, ElementType.LOCAL_VARIABLE })
+	@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
+			ElementType.PARAMETER, ElementType.LOCAL_VARIABLE})
 	@Retention(RetentionPolicy.RUNTIME)
 	@Documented
 	@interface List {
+
 		Email[] value();
 	}
 }

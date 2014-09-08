@@ -1,11 +1,11 @@
 package org.swa.conf.datatypes;
 
-import static org.junit.Assert.*;
-
 import java.util.Date;
-
 import javax.inject.Inject;
 import javax.validation.ValidationException;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -23,7 +23,7 @@ public class ConferenceTest {
 	}
 
 	@Inject
-	private ModelValidator	validator;
+	private ModelValidator validator;
 
 	@Test
 	public void crossAttributesTest() {

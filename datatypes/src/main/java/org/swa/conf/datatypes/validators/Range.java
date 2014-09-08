@@ -7,17 +7,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
 /** Numeric value in a range &ltmin ; max&gt */
-@Constraint(validatedBy = { Range.RangeValidator.class })
+@Constraint(validatedBy = {Range.RangeValidator.class})
 @Documented
-@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
-	ElementType.PARAMETER, ElementType.LOCAL_VARIABLE })
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
+		ElementType.PARAMETER, ElementType.LOCAL_VARIABLE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Range {
 
@@ -36,14 +35,16 @@ public @interface Range {
 
 	class RangeValidator implements ConstraintValidator<Range, Number> {
 
-		private BigDecimal	min;
-		private BigDecimal	max;
-		private boolean			openInterval;
+		private BigDecimal min;
+		private BigDecimal max;
+		private boolean openInterval;
 
 		@Override
 		public void initialize(final Range r) {
-			min = r.min().isEmpty() ? BigDecimal.valueOf(-Double.MAX_VALUE) : new BigDecimal(r.min()).stripTrailingZeros();
-			max = r.max().isEmpty() ? BigDecimal.valueOf(Double.MAX_VALUE) : new BigDecimal(r.max()).stripTrailingZeros();
+			min = r.min().isEmpty() ? BigDecimal.valueOf(-Double.MAX_VALUE) : new BigDecimal(r.min())
+					.stripTrailingZeros();
+			max = r.max().isEmpty() ? BigDecimal.valueOf(Double.MAX_VALUE) : new BigDecimal(r.max())
+					.stripTrailingZeros();
 			openInterval = r.min().isEmpty() && r.max().isEmpty();
 		}
 
@@ -80,10 +81,10 @@ public @interface Range {
 				return false;
 			}
 
-			if (N.compareTo(min) == -1)
+			if (N.compareTo(min) < 0)
 				return false;
 
-			if (N.compareTo(max) == +1)
+			if (N.compareTo(max) > 0)
 				return false;
 
 			return true;

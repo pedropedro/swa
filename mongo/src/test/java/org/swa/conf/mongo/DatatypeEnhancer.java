@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -22,14 +21,14 @@ import org.jboss.shrinkwrap.spi.Identifiable;
 import org.junit.Ignore;
 import org.slf4j.Logger;
 
-// TODO ablage für spätere wiederverwendung bei ASM byte code manipulation vom BasePersistenceBean.save interceptor
+//TODO ablage für spätere wiederverwendung bei ASM byte code manipulation vom BasePersistenceBean.save interceptor
 @Ignore
 public class DatatypeEnhancer {
 
 	@Inject
-	private Logger										log;
+	private Logger log;
 
-	private Map<String, List<Method>>	embeddedDocuments;
+	private Map<String, List<Method>> embeddedDocuments;
 
 	public <T> List<T> getFlattenSubdocuments(final T d) {
 
@@ -52,7 +51,6 @@ public class DatatypeEnhancer {
 						l.addAll(this.getFlattenSubdocuments((T) e));
 					}
 				}
-
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				this.log.error("Cannot invoke method {}.{}", d, getter.getName());
 				throw new InternalError(e.getMessage());
@@ -87,16 +85,19 @@ public class DatatypeEnhancer {
 
 							(m.getGenericReturnType() instanceof ParameterizedType
 
-							&& ((ParameterizedType) m.getGenericReturnType()).getActualTypeArguments().length == 1
+									&& ((ParameterizedType) m.getGenericReturnType()).getActualTypeArguments().length
+									== 1
 
-							&& ((ParameterizedType) m.getGenericReturnType()).getActualTypeArguments()[0] instanceof Class
+									&& ((ParameterizedType) m.getGenericReturnType()).getActualTypeArguments()[0]
+									instanceof Class
 
-							&& Identifiable.class.isAssignableFrom((Class<?>) ((ParameterizedType) m.getGenericReturnType())
+									&& Identifiable.class.isAssignableFrom((Class<?>) ((ParameterizedType) m
+									.getGenericReturnType())
 									.getActualTypeArguments()[0])
 
 							)
 
-					)
+							)
 						docGetters.add(m);
 
 				this.embeddedDocuments.put(className, docGetters);
@@ -108,7 +109,7 @@ public class DatatypeEnhancer {
 	 * Scans all classes accessible from the context class loader which belong to the given package and subpackages.
 	 *
 	 * @param packageName
-	 *          The base package
+	 * 		The base package
 	 * @return The classes
 	 */
 	public static List<String> getClasses(final String packageName) throws Exception {
@@ -138,9 +139,9 @@ public class DatatypeEnhancer {
 	 * Recursive method used to find all class names in a given base directory and subdirs.
 	 *
 	 * @param directory
-	 *          The base directory
+	 * 		The base directory
 	 * @param packageName
-	 *          The package name for classes found inside the base directory
+	 * 		The package name for classes found inside the base directory
 	 * @return The class names
 	 * @throws Exception
 	 */

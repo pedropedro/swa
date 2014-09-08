@@ -2,7 +2,7 @@ package org.swa.conf.datatypes;
 
 class CloneableTalk extends Talk {
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public Talk clone() {

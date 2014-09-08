@@ -1,7 +1,6 @@
 package org.swa.conf.business.service;
 
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -15,12 +14,12 @@ import org.swa.conf.datatypes.User;
 public class UserService {
 
 	@Inject
-	private Logger												log;
+	private Logger log;
 
 	@Inject
-	private BasePersistenceService<User>	persistence;
+	private BasePersistenceService<User> persistence;
 
-	public User findById(final Object id) {
+	public User findById(final Long id) {
 		return persistence.findById(id);
 	}
 
@@ -36,7 +35,7 @@ public class UserService {
 		persistence.remove(t);
 	}
 
-	private final StandardStringDigester	digester	= new StandardStringDigester();
+	private final StandardStringDigester digester = new StandardStringDigester();
 
 	public String digest(final String plain) {
 		return digester.digest(plain);

@@ -2,7 +2,6 @@ package org.swa.conf.monitoring;
 
 import java.lang.management.ManagementFactory;
 import java.util.Date;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.LocalBean;
@@ -14,14 +13,12 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.slf4j.Logger;
-import org.swa.conf.monitoring.StatisticsPersister.HistogramEntry;
-import org.swa.conf.monitoring.StatisticsPersister.StatType;
 
 @ApplicationScoped
 @LocalBean
 public class MonitoringResource implements MonitoringResourceMXBean {
 
-	public static final ObjectName	MBEAN_NAME;
+	public static final ObjectName MBEAN_NAME;
 
 	static {
 		ObjectName on = null;
@@ -34,20 +31,20 @@ public class MonitoringResource implements MonitoringResourceMXBean {
 		}
 	}
 
-	private MBeanServer							platformMBeanServer;
+	private MBeanServer platformMBeanServer;
 
 	@Inject
-	private StatisticsPersister			persister;
+	private StatisticsPersister persister;
 
 	@Inject
-	private Logger									log;
+	private Logger log;
 
 	@PostConstruct
 	public void registerInJMX() {
 		try {
-			log.debug("Registering {} in JMX", MonitoringResource.MBEAN_NAME);
+			log.debug("Registering {} in JMX", MBEAN_NAME);
 			platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-			platformMBeanServer.registerMBean(this, MonitoringResource.MBEAN_NAME);
+			platformMBeanServer.registerMBean(this, MBEAN_NAME);
 		} catch (final Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -55,9 +52,9 @@ public class MonitoringResource implements MonitoringResourceMXBean {
 
 	@PreDestroy
 	public void unregisterFromJMX() {
-		log.debug("Unregistering {} from JMX", MonitoringResource.MBEAN_NAME);
+		log.debug("Unregistering {} from JMX", MBEAN_NAME);
 		try {
-			platformMBeanServer.unregisterMBean(MonitoringResource.MBEAN_NAME);
+			platformMBeanServer.unregisterMBean(MBEAN_NAME);
 		} catch (final Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -65,17 +62,17 @@ public class MonitoringResource implements MonitoringResourceMXBean {
 
 	// MXBean -----------------------------------------------------------
 	@Override
-	public HistogramEntry[] getHistogram(final String statType, final String key, final Date from, final Date to,
-			final String coarseness) {
+	public StatisticsPersister.HistogramEntry[] getHistogram(final String statType, final String key, final Date from,
+			final Date to, final String coarseness) {
 
-		StatType st;
+		final StatisticsPersister.StatType st;
 
 		if (statType.toLowerCase().startsWith("i"))
-			st = StatType.INVOCATIONS;
+			st = StatisticsPersister.StatType.INVOCATIONS;
 		else if (statType.toLowerCase().startsWith("e"))
-			st = StatType.EXCEPTIONS;
+			st = StatisticsPersister.StatType.EXCEPTIONS;
 		else if (statType.toLowerCase().startsWith("r"))
-			st = StatType.RESPONSES;
+			st = StatisticsPersister.StatType.RESPONSES;
 		else
 			throw new IllegalArgumentException("Supported values for P1: InVoCaTions, EXCEPTIONS, responses");
 
@@ -90,6 +87,7 @@ public class MonitoringResource implements MonitoringResourceMXBean {
 	}
 
 	// Bridge to Interceptors ------------------------------------------------
+
 	/** Convenience for interceptors */
 	public String constructKey(final InvocationContext ctx) {
 		return ctx.getTarget().getClass().getName() + ctx.getMethod().getName();

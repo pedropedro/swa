@@ -4,16 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ResourceBundle;
-
-import org.bson.types.ObjectId;
-import org.jongo.Jongo;
-import org.jongo.MongoCollection;
-import org.swa.conf.mongo.collections.ConferenceCollection;
-import org.swa.conf.mongo.collections.LocationCollection;
-import org.swa.conf.mongo.collections.RoomCollection;
-import org.swa.conf.mongo.collections.SpeakerCollection;
-import org.swa.conf.mongo.collections.TalkCollection;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.DB;
@@ -24,22 +14,29 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
+import org.jongo.Jongo;
+import org.jongo.MongoCollection;
+import org.swa.conf.mongo.collections.ConferenceCollection;
+import org.swa.conf.mongo.collections.LocationCollection;
+import org.swa.conf.mongo.collections.RoomCollection;
+import org.swa.conf.mongo.collections.SpeakerCollection;
+import org.swa.conf.mongo.collections.TalkCollection;
 
 public class Tester {
 
-	private static final boolean	useFake	= true;
+	private static final boolean useFake = true;
 
 	public static void main(final String[] args) throws UnknownHostException {
 
-		final ResourceBundle bundle = ResourceBundle.getBundle("mongodb");
-		final String connString = bundle.getString("connection");
+		final String connString = "mongodb://localhost:27017";
 
 		final MongoClientOptions.Builder options = new MongoClientOptions.Builder();
 		options.cursorFinalizerEnabled(false);
 
 		final MongoClientURI mongoURI = new MongoClientURI(connString, options);
 
-		final Mongo mongo = Tester.useFake ? new Fongo("Fongo").getMongo() : Mongo.Holder.singleton().connect(mongoURI);
+		final Mongo mongo = Tester.useFake ? new Fongo("Fongo").getMongo() : Mongo.Holder.singleton().connect
+				(mongoURI);
 
 		final Jongo jongo = new Jongo(mongo.getDB("test"));
 		final MongoCollection cl = jongo.getCollection("cl");
@@ -52,22 +49,26 @@ public class Tester {
 
 		final List<RoomCollection> rooms = new ArrayList<>();
 		RoomCollection r = new RoomCollection();
+		r.setId(1L);
 		r.setName("R1");
 		r.setCapacity(100);
 		rooms.add(r);
 		r = new RoomCollection();
+		r.setId(2L);
 		r.setName("R22");
 		r.setCapacity(500);
 		rooms.add(r);
 
 		final List<SpeakerCollection> speakers = new ArrayList<>();
 		final SpeakerCollection s = new SpeakerCollection();
+		s.setId(1L);
 		s.setDescription("Speaker description");
 		s.setName("Speaker 1");
 		speakers.add(s);
 
 		final List<TalkCollection> talks = new ArrayList<>();
 		final TalkCollection t = new TalkCollection();
+		t.setId(1L);
 		t.setFrom(new Date());
 		t.setName("Talk name");
 		t.setRooms(rooms);
@@ -77,6 +78,7 @@ public class Tester {
 		talks.add(t);
 
 		final LocationCollection l = new LocationCollection();
+		l.setId(1L);
 		l.setCity("Sin");
 		l.setLatitude(66.66);
 		l.setLongitude(6.6);
@@ -84,6 +86,7 @@ public class Tester {
 		l.setRooms(rooms);
 
 		final ConferenceCollection c = new ConferenceCollection();
+		c.setId(1L);
 		c.setCity(l);
 		c.setDescription("Conference description");
 		c.setFrom(new Date());
@@ -101,8 +104,8 @@ public class Tester {
 			System.out.println(dbo);
 		System.out.println("<--- DB state");
 
-		final ObjectId newId = new ObjectId(c.getId().toString());
-		final ConferenceCollection locRead = cl.findOne(newId).as(ConferenceCollection.class);
+		final Long newId = c.getId();
+		final ConferenceCollection locRead = cl.findOne("{_id:#}", newId).as(ConferenceCollection.class);
 
 		System.out.println(locRead);
 

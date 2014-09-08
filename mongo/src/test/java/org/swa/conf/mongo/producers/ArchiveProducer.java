@@ -9,7 +9,7 @@ import org.swa.conf.monitoring.LoggerProducer;
 
 public class ArchiveProducer {
 
-	public static PomEquippedResolveStage	pers	= Maven.configureResolver().workOffline().loadPomFromFile("pom.xml");
+	public static PomEquippedResolveStage pers = Maven.configureResolver().workOffline().loadPomFromFile("pom.xml");
 
 	public static WebArchive createMongoTestWebArchive() {
 
@@ -19,9 +19,9 @@ public class ArchiveProducer {
 		war.addPackages(false, "org.swa.conf.business.persistence");
 		war.addClass(EnvironmentEntriesHolder.class);
 		war.addClass(LoggerProducer.class);
-		war.addAsLibraries(ArchiveProducer.pers.resolve("org.mongodb:mongo-java-driver").withTransitivity().asFile());
-		war.addAsLibraries(ArchiveProducer.pers.resolve("org.jongo:jongo").withTransitivity().asFile());
-		war.addAsLibraries(ArchiveProducer.pers.resolve("com.github.fakemongo:fongo").withTransitivity().asFile());
+		war.addAsLibraries(pers.resolve("org.mongodb:mongo-java-driver").withTransitivity().asFile());
+		war.addAsLibraries(pers.resolve("org.jongo:jongo").withTransitivity().asFile());
+		war.addAsLibraries(pers.resolve("com.github.fakemongo:fongo").withTransitivity().asFile());
 		war.addAsWebInfResource("mongo-ejb-jar.xml", "ejb-jar.xml");
 		war.addAsWebInfResource("empty-beans.xml", "beans.xml");
 		System.out.println(war.toString(true));
@@ -32,9 +32,9 @@ public class ArchiveProducer {
 
 		final WebArchive war = ShrinkWrap.create(WebArchive.class, "conf-ejb.war");
 		war.addPackages(true, "org.swa.conf");
-		war.addAsLibraries(ArchiveProducer.pers.resolve("org.mongodb:mongo-java-driver").withTransitivity().asFile());
-		war.addAsLibraries(ArchiveProducer.pers.resolve("org.jongo:jongo").withTransitivity().asFile());
-		war.addAsLibraries(ArchiveProducer.pers.resolve("com.github.fakemongo:fongo").withTransitivity().asFile());
+		war.addAsLibraries(pers.resolve("org.mongodb:mongo-java-driver").withTransitivity().asFile());
+		war.addAsLibraries(pers.resolve("org.jongo:jongo").withTransitivity().asFile());
+		war.addAsLibraries(pers.resolve("com.github.fakemongo:fongo").withTransitivity().asFile());
 		war.addAsWebInfResource("mongo-ejb-jar.xml", "ejb-jar.xml");
 		war.addAsWebInfResource("interceptor-beans.xml", "beans.xml");
 		// war.merge( ShrinkWrap.create(GenericArchive.class).as(ExplodedImporter.class).importDirectory("WEBAPP_SRC")

@@ -3,20 +3,19 @@ package org.swa.conf.datatypes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
 public class Talk extends AbstractDatatype {
 
-	private static final long				serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
-	private String									name;
-	private String									shortAbstract;
-	private Date										from;
-	private Date										to;
-	private List<? extends Speaker>	speakers;
-	private List<? extends Room>		rooms;
+	private String name;
+	private String shortAbstract;
+	private Date from;
+	private Date to;
+	private List<? extends Speaker> speakers;
+	private List<? extends Room> rooms;
 
 	/** Cross-property validation - check the visibility !!! */
 	@AssertTrue(message = "{invalid.time-interval}")
@@ -56,16 +55,19 @@ public class Talk extends AbstractDatatype {
 	}
 
 	public Talk setName(final String name) {
+
 		this.name = name;
 		return this;
 	}
 
 	public Talk setShortAbstract(final String shortAbstract) {
+
 		this.shortAbstract = shortAbstract;
 		return this;
 	}
 
 	public Talk setFrom(final Date from) {
+
 		this.from = from;
 		return this;
 	}

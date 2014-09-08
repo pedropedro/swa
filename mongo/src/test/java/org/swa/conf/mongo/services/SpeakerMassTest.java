@@ -1,9 +1,10 @@
 package org.swa.conf.mongo.services;
 
-import static org.junit.Assert.*;
-
 import javax.inject.Inject;
 
+import static org.junit.Assert.*;
+
+import com.mongodb.DBObject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
@@ -18,8 +19,6 @@ import org.swa.conf.mongo.DataLoader;
 import org.swa.conf.mongo.collections.SpeakerCollection;
 import org.swa.conf.mongo.producers.ArchiveProducer;
 
-import com.mongodb.DBObject;
-
 @RunWith(Arquillian.class)
 public class SpeakerMassTest {
 
@@ -33,34 +32,34 @@ public class SpeakerMassTest {
 	}
 
 	@Inject
-	private DataLoader											l;
+	private DataLoader l;
 
 	@Inject
-	private BasePersistenceService<Speaker>	persistence;
+	private BasePersistenceService<Speaker> persistence;
 
 	@Inject
-	private SpeakerPersistenceLocalBean			localBeanDbReader;
+	private SpeakerPersistenceLocalBean localBeanDbReader;
 
 	@Inject
-	private Logger													log;
+	private Logger log;
 
-	private static String										SPEAKERS	= "speaker";
+	private static final String SPEAKERS = "speaker";
 
 	@Test
 	@InSequence(value = 10)
 	public void test1() {
 
-		l.load(SpeakerMassTest.SPEAKERS, DataLoader.Strategy.SET, "test1");
+		l.load(SPEAKERS, DataLoader.Strategy.SET, "test1");
 
-		final SpeakerCollection s = new SpeakerCollection().withOid("000000000000000000000004");
+		final SpeakerCollection s = new SpeakerCollection();
+		s.setId(40000000000L);
 		s.setDescription("Speaker description");
 		s.setName("Speaker 1");
 
+		persistence.save(s);
 		assertNotNull(s.getId());
 
-		persistence.save(s);
-
-		assertTrue(l.match(SpeakerMassTest.SPEAKERS, "test1"));
+		assertTrue(l.match(SPEAKERS, "test1"));
 
 		l.dump("speaker", "test1");
 	}
@@ -72,19 +71,19 @@ public class SpeakerMassTest {
 		for (final DBObject dbo : localBeanDbReader.getCollection().getDBCollection().find())
 			log.debug("{}", dbo);
 
-		l.load(SpeakerMassTest.SPEAKERS, DataLoader.Strategy.TRIM, null);
+		l.load(SPEAKERS, DataLoader.Strategy.TRIM, null);
 	}
 
 	@Test
 	@InSequence(value = 30)
 	public void test3() {
-		l.load(SpeakerMassTest.SPEAKERS, DataLoader.Strategy.ADD, "test1");
+		l.load(SPEAKERS, DataLoader.Strategy.ADD, "test1");
 	}
 
 	@Test
 	@InSequence(value = 40)
 	public void test4() {
-		l.trim(SpeakerMassTest.SPEAKERS);
+		l.trim(SPEAKERS);
 		assertEquals(0, localBeanDbReader.getCollection().getDBCollection().find().length());
 	}
 }

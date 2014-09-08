@@ -12,7 +12,7 @@ import javax.interceptor.InvocationContext;
 public class InvocationStatistics {
 
 	@Inject
-	private MonitoringResource	monitor;
+	private MonitoringResource monitor;
 
 	@AroundInvoke
 	public Object countMethodInvocation(final InvocationContext ctx) throws Exception {
@@ -24,7 +24,7 @@ public class InvocationStatistics {
 
 		} catch (final Exception e) {
 			monitor.exceptionThrown(key);
-			if (e.getMessage().equals("Expected exception thrown"))
+			if ("Expected exception thrown".equals(e.getMessage()))
 				return ctx.getParameters()[0]; // just for tests !!!
 			else
 				throw e;

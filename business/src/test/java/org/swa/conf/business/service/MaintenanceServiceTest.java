@@ -1,18 +1,17 @@
 package org.swa.conf.business.service;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.EJB;
 import javax.ejb.TimerHandle;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+
+import static org.junit.Assert.*;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -40,11 +39,12 @@ public class MaintenanceServiceTest {
 	// -------------------------------------------------------------------------------------
 
 	@EJB
-	private MaintenanceServiceTest	_selfAsEjbSingleton;
+	private MaintenanceServiceTest _selfAsEjbSingleton;
 
-	private final List<User>				users	= new ArrayList<>();
+	private final List<User> users = new ArrayList<>();
 
 	public List<User> getUsers() {
+
 		return users;
 	}
 
@@ -53,9 +53,10 @@ public class MaintenanceServiceTest {
 		log.debug("Received user {} in {}", e.getUser(), this);
 	}
 
-	volatile private TimerHandle	timerHandle;
+	volatile private TimerHandle timerHandle;
 
 	public TimerHandle getTimerHandle() {
+
 		return timerHandle;
 	}
 
@@ -81,10 +82,10 @@ public class MaintenanceServiceTest {
 	}
 
 	@Inject
-	private Logger												log;
+	private Logger log;
 
 	@Inject
-	private BasePersistenceService<User>	db;
+	private BasePersistenceService<User> db;
 
 	@Test
 	public void scheduleTest() throws InterruptedException {
@@ -92,24 +93,24 @@ public class MaintenanceServiceTest {
 		final String expiredPwd = "Need passw change";
 
 		User u = new User();
-		u.setId("1");
+		u.setId(1L);
 		u.setName(expiredPwd);
 		u.setPassword("very old");
 		u.setLastPasswordChange(new Date(0));
 		db.save(u);
 
 		u = new User();
-		u.setId("2");
+		u.setId(2L);
 		u.setName("No need to passw change");
 		u.setPassword("fresh");
 		u.setLastPasswordChange(new Date());
 		db.save(u);
 
 		u = new User();
-		u.setId("3");
+		u.setId(3L);
 		u.setName(expiredPwd);
 		u.setPassword("old");
-		u.setLastPasswordChange(new Date(15000l * 24l * 60l * 60l * 1000l));
+		u.setLastPasswordChange(new Date(15000L * 24L * 60L * 60L * 1000L));
 		db.save(u);
 
 		while (_selfAsEjbSingleton.getUsers().size() < 2)

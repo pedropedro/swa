@@ -6,7 +6,7 @@ import org.swa.conf.datatypes.AbstractDatatype;
 
 public interface BasePersistenceService<T extends AbstractDatatype> {
 
-	public T findById(final Object id);
+	public T findById(final Long id);
 
 	public List<T> findAll();
 
@@ -14,7 +14,7 @@ public interface BasePersistenceService<T extends AbstractDatatype> {
 
 	public void remove(final T t);
 
-	public void remove(final Object id);
+	public void remove(final Long id);
 
-	public boolean exist(final Object id);
+	public boolean exist(final Long id);
 }

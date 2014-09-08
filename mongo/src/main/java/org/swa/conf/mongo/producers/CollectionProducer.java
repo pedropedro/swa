@@ -3,33 +3,31 @@ package org.swa.conf.mongo.producers;
 import java.lang.annotation.Annotation;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
+import com.mongodb.Mongo;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.slf4j.Logger;
 import org.swa.conf.configuration.EnvironmentEntriesHolder;
 import org.swa.conf.mongo.annotations.NamedCollection;
 
-import com.mongodb.Mongo;
-
 @ApplicationScoped
 class CollectionProducer {
 
-	private static final String									COLL_PREFIX	= "collection.";
+	private static final String COLL_PREFIX = "collection.";
 
 	@Inject
-	private Logger															log;
+	private Logger log;
 
 	@Inject
-	private EnvironmentEntriesHolder						entryHolder;
+	private EnvironmentEntriesHolder entryHolder;
 
-	private final ConcurrentMap<String, Jongo>	_jongos			= new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Jongo> _jongos = new ConcurrentHashMap<>();
 
 	@Produces
 	@Dependent

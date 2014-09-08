@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.PostConstruct;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
@@ -25,17 +24,17 @@ import org.slf4j.Logger;
 @javax.ejb.Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-/** Convenience bridge for the DevOps between our application and deployment configuration in the ejb-jar.xml descriptor. */
+/** Convenience bridge for the DevOps between our application and deployment configuration in the ejb-jar.xml
+ * descriptor. */
 public class EnvironmentEntriesHolder {
 
-	public final String						ENV_passwordChangePeriodInDays	= "passwordChangePeriodInDays";
+	public final String ENV_passwordChangePeriodInDays = "passwordChangePeriodInDays";
 
 	@Inject
-	private Logger								log;
+	private Logger log;
 
-	private javax.naming.Context	ctx;
-	private Map<String, Object>		cache;
-	private Set<String>						entryNames;
+	private Map<String, Object> cache;
+	private Set<String> entryNames;
 
 	@PostConstruct
 	private void Init() {
@@ -44,10 +43,10 @@ public class EnvironmentEntriesHolder {
 		entryNames = new HashSet<>();
 
 		try {
-			ctx = (javax.naming.Context) new InitialContext().lookup("java:comp/env");
+			final javax.naming.Context ctx = (javax.naming.Context) new InitialContext().lookup("java:comp/env");
 
 			log.info("Configured with following values:");
-			for (final NamingEnumeration<Binding> e = ctx.listBindings("/env"); e.hasMoreElements();) {
+			for (final NamingEnumeration<Binding> e = ctx.listBindings("/env"); e.hasMoreElements(); ) {
 
 				final Binding b = e.nextElement();
 
@@ -71,7 +70,7 @@ public class EnvironmentEntriesHolder {
 	}
 
 	/**
-	 * Not synchronized setter for new runtime environment entry values - supposed to be used by a MXBean ! It cannot be
+	 * Not synchronized setter for new runtime environment entry values - supposed to be used by a MXBean! It cannot be
 	 * made package-visible, WELD doesn't like it
 	 */
 	public void setNewRuntimeValue(final String name, final Object value) {

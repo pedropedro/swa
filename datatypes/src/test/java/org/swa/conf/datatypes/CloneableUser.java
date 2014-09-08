@@ -2,7 +2,7 @@ package org.swa.conf.datatypes;
 
 class CloneableUser extends User {
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public User clone() {

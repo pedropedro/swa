@@ -1,7 +1,6 @@
 package org.swa.conf.configuration;
 
 import java.lang.management.ManagementFactory;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.LocalBean;
@@ -17,7 +16,7 @@ import org.slf4j.Logger;
 @LocalBean
 public class RuntimeConfiguration implements RuntimeConfigurationMXBean {
 
-	public static final ObjectName		MBEAN_NAME;
+	public static final ObjectName MBEAN_NAME;
 
 	static {
 		ObjectName on = null;
@@ -30,13 +29,13 @@ public class RuntimeConfiguration implements RuntimeConfigurationMXBean {
 		}
 	}
 
-	private MBeanServer								platformMBeanServer;
+	private MBeanServer platformMBeanServer;
 
 	@Inject
-	private Logger										log;
+	private Logger log;
 
 	@Inject
-	private EnvironmentEntriesHolder	entryHolder;
+	private EnvironmentEntriesHolder entryHolder;
 
 	@PostConstruct
 	public void registerInJMX() {

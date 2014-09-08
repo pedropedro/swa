@@ -2,7 +2,7 @@ package org.swa.conf.datatypes;
 
 class CloneableConference extends Conference {
 
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public Conference clone() {

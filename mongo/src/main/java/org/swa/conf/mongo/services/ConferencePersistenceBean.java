@@ -18,7 +18,7 @@ public class ConferencePersistenceBean extends BasePersistenceBean<Conference> {
 
 	@Inject
 	@NamedCollection(logicalName = "conference")
-	private MongoCollection	c;
+	private MongoCollection c;
 
 	@Override
 	public MongoCollection getCollection() {
@@ -29,6 +29,6 @@ public class ConferencePersistenceBean extends BasePersistenceBean<Conference> {
 	@Override
 	@PostConstruct
 	protected void setGenericClass() {
-		this.setGenericClass(ConferenceCollection.class);
+		setGenericClass(ConferenceCollection.class);
 	}
 }

@@ -18,7 +18,7 @@ public class UserPersistenceBean extends BasePersistenceBean<User> {
 
 	@Inject
 	@NamedCollection(logicalName = "user")
-	private MongoCollection	c;
+	private MongoCollection c;
 
 	@Override
 	public MongoCollection getCollection() {
@@ -29,6 +29,6 @@ public class UserPersistenceBean extends BasePersistenceBean<User> {
 	@Override
 	@PostConstruct
 	protected void setGenericClass() {
-		this.setGenericClass(UserCollection.class);
+		setGenericClass(UserCollection.class);
 	}
 }

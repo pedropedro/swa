@@ -2,10 +2,8 @@ package org.swa.conf.mongo.services;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.inject.Inject;
 
-import org.bson.types.ObjectId;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
@@ -29,12 +27,12 @@ public class LocationPersistenceBeanTest {
 	}
 
 	@Inject
-	private BasePersistenceService<Location>	persistence;
+	private BasePersistenceService<Location> persistence;
 
 	@Test
 	@InSequence(value = 10)
 	public void notFound() {
-		final Location rec = persistence.findById(new ObjectId("1234567890abcdef12345678"));
+		final Location rec = persistence.findById(-1L);
 		Assert.assertNull(rec);
 	}
 
@@ -43,28 +41,31 @@ public class LocationPersistenceBeanTest {
 	public void crud() {
 
 		final List<RoomCollection> rooms = new ArrayList<>();
-		RoomCollection room = new RoomCollection().withOid();
+		RoomCollection room = new RoomCollection();
+		room.setId(1L);
 		room.setName("R1");
 		room.setCapacity(100);
 		rooms.add(room);
-		room = new RoomCollection().withOid();
+		room = new RoomCollection();
+		room.setId(2L);
 		room.setName("R22");
 		room.setCapacity(500);
 		rooms.add(room);
 
-		final LocationCollection l = new LocationCollection().withOid();
+		final LocationCollection l = new LocationCollection();
+		l.setId(null);
 		l.setCity("Sin");
 		l.setLatitude(66.66);
 		l.setLongitude(6.6);
 		l.setStreet("Abc Str");
 		l.setRooms(rooms);
 
-		Assert.assertNotNull(l.getId());
 		for (final AbstractDatatype r : l.getRooms())
 			Assert.assertNotNull(r.getId());
 
 		// Create
 		persistence.save(l);
+		Assert.assertNotNull(l.getId());
 
 		// Read
 		final Location l2 = persistence.findById(l.getId());

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.inject.Inject;
@@ -18,43 +17,20 @@ import org.swa.conf.datatypes.AbstractDatatype;
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class BasePersistenceBean<T extends AbstractDatatype> implements BasePersistenceService<T> {
 
-	private final Map<Object, T>	database		= new HashMap<>();
+	private final Map<Object, T> database = new HashMap<>();
 
-	private final AtomicLong			idGenerator	= new AtomicLong(0);
-
-	private Class<?>							idClass;
+	private final AtomicLong idGenerator = new AtomicLong(0);
 
 	@Inject
-	private Logger								log;
-
-	protected Object convertId(final Object id) {
-		if (id != null && id.getClass() != idClass) {
-			if (idClass != null && idClass == String.class)
-				return id.toString();
-			else if (idClass != null && idClass == Long.class) {
-				try {
-					return Long.valueOf(id.toString());
-				} catch (final NumberFormatException e) {
-					return Long.decode("0x" + id.toString());
-				}
-			}
-		}
-		return id;
-	}
+	private Logger log;
 
 	@Override
-	public T findById(final Object id) {
-		if (idClass == null && id != null) {
-			idClass = id.getClass();
-			log.debug("idClass: {}", idClass);
-		}
-
-		return database.get(convertId(id));
+	public T findById(final Long id) {
+		return database.get(id);
 	}
 
 	@Override
 	public List<T> findAll() {
-
 		final List<T> l = new ArrayList<>();
 
 		for (final T t : database.values())
@@ -65,16 +41,10 @@ public class BasePersistenceBean<T extends AbstractDatatype> implements BasePers
 
 	@Override
 	public T save(final T t) {
-		if (t.getId() == null) {
-			if (idClass != null && idClass == String.class)
-				t.setId(Long.toHexString(idGenerator.incrementAndGet()));
-			else if (idClass != null && idClass == Long.class)
-				t.setId(Long.valueOf(idGenerator.incrementAndGet()));
-			else
-				t.setId(new Object());
-		}
+		if (t.getId() == null)
+			t.setId(idGenerator.incrementAndGet());
 
-		database.put(convertId(t.getId()), t);
+		database.put(t.getId(), t);
 		return t;
 	}
 
@@ -84,12 +54,12 @@ public class BasePersistenceBean<T extends AbstractDatatype> implements BasePers
 	}
 
 	@Override
-	public void remove(final Object id) {
-		database.remove(convertId(id));
+	public void remove(final Long id) {
+		database.remove(id);
 	}
 
 	@Override
-	public boolean exist(final Object id) {
-		return database.containsKey(convertId(id));
+	public boolean exist(final Long id) {
+		return database.containsKey(id);
 	}
 }

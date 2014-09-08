@@ -4,9 +4,10 @@ import org.swa.conf.datatypes.User;
 
 public class PasswordExpiredEvent {
 
-	private final User	user;
+	private final User user;
 
 	public PasswordExpiredEvent(final User user) {
+
 		if (user == null)
 			throw new IllegalArgumentException("User is mandatory");
 

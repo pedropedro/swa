@@ -1,15 +1,14 @@
 package org.swa.conf.business.access.rest;
 
-import static org.junit.Assert.*;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import static org.junit.Assert.*;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -37,12 +36,12 @@ import org.swa.conf.datatypes.validators.ValidationException;
 @RunWith(Arquillian.class)
 public class ConferenceRestServiceTest {
 
-	private static final String	appPath	= "rest";
+	private static final String appPath = "rest";
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		final WebArchive war = ArchiveProducer.createTestWebArchive();
-		war.addClasses(ApplicationPath.class, EJBExceptionMapper.class);
+		war.addClasses(ApplicationPath.class, EJBExceptionMapper.class, StringToLong.class);
 		war.addClasses(ModelValidator.class, ValidationException.class, PathParamIdValidator.class);
 		war.addClasses(ConferenceService.class, ConferencePersistenceBean.class, ConferenceCollection.class);
 		war.addClasses(ConferenceRestService.class, ConferenceRestServiceBean.class);
@@ -53,45 +52,43 @@ public class ConferenceRestServiceTest {
 	}
 
 	@Inject
-	private ConferenceService	s;
+	private ConferenceService s;
 
-	private static final long	HOUR	= 60l * 60 * 1000l;
-	private static final long	DAY		= 24l * ConferenceRestServiceTest.HOUR;
+	private static final long HOUR = 60L * 60L * 1000L;
+	private static final long DAY = 24L * ConferenceRestServiceTest.HOUR;
 
 	@Test
 	@InSequence(value = 1)
 	public void setupTestData() {
-		// tell the test storage we want get ID generated as java.lang.Long ...
-		s.findById(Long.valueOf(42));
 
 		final Location l = new Location();
-		l.setId(11l);
+		l.setId(11L);
 		l.setCity("city");
 		l.setStreet("street");
 
 		final List<Talk> talks = new ArrayList<>();
 		Talk t = new Talk();
-		t.setId(21l);
+		t.setId(21L);
 		t.setName("talk 1");
-		t.setFrom(new Date(8l * ConferenceRestServiceTest.HOUR));
-		t.setTo(new Date(10l * ConferenceRestServiceTest.HOUR));
+		t.setFrom(new Date(8L * ConferenceRestServiceTest.HOUR));
+		t.setTo(new Date(10L * ConferenceRestServiceTest.HOUR));
 		talks.add(t);
 		t = new Talk();
-		t.setId(22l);
+		t.setId(22L);
 		t.setName("talk 2");
-		t.setFrom(new Date(13l * ConferenceRestServiceTest.HOUR));
-		t.setTo(new Date(16l * ConferenceRestServiceTest.HOUR));
+		t.setFrom(new Date(13L * ConferenceRestServiceTest.HOUR));
+		t.setTo(new Date(16L * ConferenceRestServiceTest.HOUR));
 		talks.add(t);
 
 		Conference c = new Conference();
 		c.setName("Name 1");
 		c.setDescription("description 1");
 		c.setFrom(new Date(0));
-		c.setTo(new Date(5l * ConferenceRestServiceTest.DAY));
+		c.setTo(new Date(5L * ConferenceRestServiceTest.DAY));
 		c.setCity(l);
 		c.setTalks(talks);
 		s.save(c);
-		assertEquals(1l, c.getId());
+		assertEquals(Long.valueOf(1L), c.getId());
 
 		c = new Conference();
 		c.setName("Name 2");
@@ -99,7 +96,7 @@ public class ConferenceRestServiceTest {
 		c.setFrom(new Date(0));
 		c.setTo(new Date(5l * ConferenceRestServiceTest.DAY));
 		s.save(c);
-		assertEquals(2l, c.getId());
+		assertEquals(Long.valueOf(2L), c.getId());
 	}
 
 	@Test
@@ -116,15 +113,14 @@ public class ConferenceRestServiceTest {
 		clientLog.info("Deployment URL : " + deploymentURL);
 		clientLog.info("Web target : " + webTarget);
 
-		// Get the test data thru REST back again ...
+		// Get the test data through REST back again ...
 		final Response rs = resource.getOne("1");
 		assertEquals(Status.OK, rs.getStatusInfo());
 		assertTrue(rs.hasEntity());
 		final Conference d = rs.readEntity(Conference.class);
 		rs.close();
 
-		// !!! Although stored as Long, the Jackson unmarshaler extracts it as Integer !!!
-		assertEquals(Integer.valueOf(1), d.getId());
+		assertEquals(Long.valueOf(1), d.getId());
 		assertEquals("Name 1", d.getName());
 
 		// final Invocation.Builder invocationBuilder = webTarget.request();
@@ -154,7 +150,7 @@ public class ConferenceRestServiceTest {
 				"\"message\":\"The id must be a valid decimal or hexadecimal number\",\"value\":\"XYZ\""));
 		rs.close();
 
-		rs = resource.getOne("FFFFFF");
+		rs = resource.getOne("xFFFFFF");
 		assertEquals(Status.NOT_FOUND, rs.getStatusInfo());
 		rs.close();
 
@@ -182,7 +178,7 @@ public class ConferenceRestServiceTest {
 	public void testDeleteNonExistent(
 			@ArquillianResteasyResource(ConferenceRestServiceTest.appPath) final ConferenceRestService resource) {
 
-		final Response rs = resource.delete("FFFFFF");
+		final Response rs = resource.delete("XFFFFFF");
 		assertEquals(Status.OK, rs.getStatusInfo());
 		assertNotNull(rs.getLink("parent"));
 		assertEquals("/" + ArchiveProducer.APP + "/" + ConferenceRestServiceTest.appPath + "/"
@@ -200,12 +196,13 @@ public class ConferenceRestServiceTest {
 		final Conference c = new Conference();
 		// c.setName("Name 3");
 		c.setDescription("description 3");
-		c.setFrom(new Date(10l * ConferenceRestServiceTest.DAY));
-		c.setTo(new Date(17l * ConferenceRestServiceTest.DAY));
+		c.setFrom(new Date(10L * ConferenceRestServiceTest.DAY));
+		c.setTo(new Date(17L * ConferenceRestServiceTest.DAY));
 
 		Response rs = resource.save(c);
 		assertEquals(Status.BAD_REQUEST, rs.getStatusInfo());
-		assertEquals("{\"!\":\"Constraint violation(s):\\nconference.name: may not be null\"}", rs.readEntity(String.class));
+		assertEquals("{\"!\":\"Constraint violation(s):\\nconference.name: may not be null\"}",
+				rs.readEntity(String.class));
 		rs.close();
 
 		c.setName("Name 3");
@@ -220,7 +217,7 @@ public class ConferenceRestServiceTest {
 		assertEquals(Status.OK, rs.getStatusInfo());
 		assertTrue(rs.hasEntity());
 		final Conference d = rs.readEntity(Conference.class);
-		assertEquals(Integer.valueOf(3), d.getId());
+		assertEquals(Long.valueOf(3), d.getId());
 		assertEquals("Name 3", d.getName());
 		rs.close();
 	}

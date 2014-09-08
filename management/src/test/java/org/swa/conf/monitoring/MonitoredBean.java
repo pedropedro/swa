@@ -1,7 +1,6 @@
 package org.swa.conf.monitoring;
 
 import java.util.Random;
-
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 

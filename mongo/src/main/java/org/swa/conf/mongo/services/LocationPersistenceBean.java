@@ -18,7 +18,7 @@ public class LocationPersistenceBean extends BasePersistenceBean<Location> {
 
 	@Inject
 	@NamedCollection(logicalName = "location")
-	private MongoCollection	c;
+	private MongoCollection c;
 
 	@Override
 	public MongoCollection getCollection() {
@@ -29,6 +29,6 @@ public class LocationPersistenceBean extends BasePersistenceBean<Location> {
 	@Override
 	@PostConstruct
 	protected void setGenericClass() {
-		this.setGenericClass(LocationCollection.class);
+		setGenericClass(LocationCollection.class);
 	}
 }

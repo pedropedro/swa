@@ -1,11 +1,11 @@
 package org.swa.conf.datatypes;
 
-import static org.junit.Assert.*;
-
 import java.util.Date;
-
 import javax.inject.Inject;
 import javax.validation.ValidationException;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -23,7 +23,7 @@ public class UserTest {
 	}
 
 	@Inject
-	private ModelValidator	validator;
+	private ModelValidator validator;
 
 	@Test
 	public void validationTest() {
@@ -44,17 +44,11 @@ public class UserTest {
 			assertTrue(e.getMessage(), e.getMessage().endsWith("\n" + "user.name: may not be null"));
 		}
 		try {
-			validator.validate(u.clone().setName(null).setId(null));
-			fail("Expected validation exception");
-		} catch (final ValidationException e) {
-			assertFalse(e.getMessage(), e.getMessage().contains("\n" + "user.id: may not be null"));
-			assertTrue(e.getMessage(), e.getMessage().contains("\n" + "user.name: may not be null"));
-		}
-		try {
 			validator.validate(u.clone().setPassword("1234567"));
 			fail("Expected validation exception");
 		} catch (final ValidationException e) {
-			assertTrue(e.getMessage(), e.getMessage().endsWith("\n" + "user.password: size must be between 8 and 128"));
+			assertTrue(e.getMessage(), e.getMessage().endsWith("\n" + "user.password: size must be between 8 and " +
+					"128"));
 			validator.validate(u.clone().setPassword("12345678"));
 		}
 		try {

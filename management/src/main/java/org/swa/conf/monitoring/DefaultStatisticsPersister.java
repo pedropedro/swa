@@ -2,21 +2,20 @@ package org.swa.conf.monitoring;
 
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingDeque;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
 /**
- * Default implementation retrieves accumulated history only - the time window and coarseness parameter in the
- * {@link #getStatistics(org.swa.conf.monitoring.StatisticsPersister.StatType, String, Date, Date, String)
- * getStatistics()} will be silently ignored. Statistics read means: total value since last application start.
+ * Default implementation retrieves accumulated history only - the time window and coarseness parameter in the {@link
+ * #getStatistics(org.swa.conf.monitoring.StatisticsPersister.StatType, String, Date, Date, String) getStatistics()}
+ * will be silently ignored. Statistics read means: total value since last application start.
  */
 @ApplicationScoped
 public class DefaultStatisticsPersister implements StatisticsPersister {
 
-	private LinkedBlockingDeque<PersistentEntry>	invocations;
-	private LinkedBlockingDeque<PersistentEntry>	exceptions;
-	private LinkedBlockingDeque<PersistentEntry>	responses;
+	private LinkedBlockingDeque<PersistentEntry> invocations;
+	private LinkedBlockingDeque<PersistentEntry> exceptions;
+	private LinkedBlockingDeque<PersistentEntry> responses;
 
 	@PostConstruct
 	private void init() {
@@ -60,22 +59,22 @@ public class DefaultStatisticsPersister implements StatisticsPersister {
 
 	@Override
 	public HistogramEntry[] getStatistics(final StatType statType, final String key, final Date from, final Date to,
-			final String coarseness) {
+										  final String coarseness) {
 
-		LinkedBlockingDeque<PersistentEntry> collection;
+		final LinkedBlockingDeque<PersistentEntry> collection;
 
 		switch (statType) {
-		case EXCEPTIONS:
-			collection = exceptions;
-			break;
-		case INVOCATIONS:
-			collection = invocations;
-			break;
-		case RESPONSES:
-			collection = responses;
-			break;
-		default:
-			throw new IllegalArgumentException("Unknown StatType" + statType);
+			case EXCEPTIONS:
+				collection = exceptions;
+				break;
+			case INVOCATIONS:
+				collection = invocations;
+				break;
+			case RESPONSES:
+				collection = responses;
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown StatType" + statType);
 		}
 
 		final HistogramEntry[] stats = new HistogramEntry[1];
