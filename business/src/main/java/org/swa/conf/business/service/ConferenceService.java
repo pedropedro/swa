@@ -4,6 +4,8 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
+import cz.jirutka.rsql.parser.RSQLParser;
+import cz.jirutka.rsql.parser.ast.Node;
 import org.slf4j.Logger;
 import org.swa.conf.business.persistence.BasePersistenceService;
 import org.swa.conf.datatypes.Conference;
@@ -22,8 +24,19 @@ public class ConferenceService {
 		return persistence.findById(id);
 	}
 
-	public List<Conference> findAll() {
-		return persistence.findAll();
+	public List<Conference> find(String query) {
+
+		if (query == null || query.isEmpty()) {
+			// check security
+			return persistence.findAll();
+		}
+
+		Node queryAST = new RSQLParser().parse(query);
+
+		// check query actual parameters in context of logged in user
+		// ...
+
+		return persistence.find(queryAST);
 	}
 
 	public Conference save(final Conference t) {

@@ -1,6 +1,5 @@
 package org.swa.conf.business.access.rest;
 
-import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -10,6 +9,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -21,29 +21,29 @@ import org.swa.conf.datatypes.Conference;
 public interface ConferenceRestService {
 
 	final String PATH_COLLECTION = "conferences";
-	final String PATH_ELEMENT = ConferenceRestService.PATH_COLLECTION + "/{id}";
+	final String PATH_ELEMENT = PATH_COLLECTION + "/{id}";
 
 	@GET
-	@Path(ConferenceRestService.PATH_COLLECTION)
-	public List<Conference> getAll();
+	@Path(PATH_COLLECTION)
+	public Response find(@QueryParam("q") final String query);
 
 	@GET
-	@Path(ConferenceRestService.PATH_ELEMENT)
-	public Response getOne(@PathParam("id") @PathParamIdValidator final String id);
+	@Path(PATH_ELEMENT)
+	public Response findById(@PathParam("id") @PathParamIdValidator final String id);
 
 	@DELETE
-	@Path(ConferenceRestService.PATH_ELEMENT)
+	@Path(PATH_ELEMENT)
 	public Response delete(@PathParam("id") @PathParamIdValidator final String id);
 
 	@PUT
-	@Path(ConferenceRestService.PATH_ELEMENT)
+	@Path(PATH_ELEMENT)
 	public Response save(@PathParam("id") @PathParamIdValidator final String id, final Conference c);
 
 	@POST
-	@Path(ConferenceRestService.PATH_COLLECTION)
+	@Path(PATH_COLLECTION)
 	public Response save(final Conference c);
 
 	@HEAD
-	@Path(ConferenceRestService.PATH_ELEMENT)
+	@Path(PATH_ELEMENT)
 	public Response exist(@PathParam("id") @PathParamIdValidator final String id);
 }

@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import static org.junit.Assert.*;
 
@@ -55,7 +54,7 @@ public class ConferenceRestServiceTest {
 	private ConferenceService s;
 
 	private static final long HOUR = 60L * 60L * 1000L;
-	private static final long DAY = 24L * ConferenceRestServiceTest.HOUR;
+	private static final long DAY = 24L * HOUR;
 
 	@Test
 	@InSequence(value = 1)
@@ -70,21 +69,21 @@ public class ConferenceRestServiceTest {
 		Talk t = new Talk();
 		t.setId(21L);
 		t.setName("talk 1");
-		t.setFrom(new Date(8L * ConferenceRestServiceTest.HOUR));
-		t.setTo(new Date(10L * ConferenceRestServiceTest.HOUR));
+		t.setFrom(new Date(8L * HOUR));
+		t.setTo(new Date(10L * HOUR));
 		talks.add(t);
 		t = new Talk();
 		t.setId(22L);
 		t.setName("talk 2");
-		t.setFrom(new Date(13L * ConferenceRestServiceTest.HOUR));
-		t.setTo(new Date(16L * ConferenceRestServiceTest.HOUR));
+		t.setFrom(new Date(13L * HOUR));
+		t.setTo(new Date(16L * HOUR));
 		talks.add(t);
 
 		Conference c = new Conference();
 		c.setName("Name 1");
 		c.setDescription("description 1");
 		c.setFrom(new Date(0));
-		c.setTo(new Date(5L * ConferenceRestServiceTest.DAY));
+		c.setTo(new Date(5L * DAY));
 		c.setCity(l);
 		c.setTalks(talks);
 		s.save(c);
@@ -94,7 +93,7 @@ public class ConferenceRestServiceTest {
 		c.setName("Name 2");
 		c.setDescription("description 2");
 		c.setFrom(new Date(0));
-		c.setTo(new Date(5l * ConferenceRestServiceTest.DAY));
+		c.setTo(new Date(5l * DAY));
 		s.save(c);
 		assertEquals(Long.valueOf(2L), c.getId());
 	}
@@ -104,18 +103,18 @@ public class ConferenceRestServiceTest {
 	@RunAsClient
 	// @Produces(MediaType.APPLICATION_XML) // Overrides designed annotation
 	public void testGetOne(
-			@ArquillianResteasyResource(ConferenceRestServiceTest.appPath) final ConferenceRestService resource,
+			@ArquillianResteasyResource(appPath) final ConferenceRestService resource,
 			@ArquillianResource final URL deploymentURL,
-			@ArquillianResteasyResource(ConferenceRestServiceTest.appPath) final ResteasyWebTarget webTarget) {
+			@ArquillianResteasyResource(appPath) final ResteasyWebTarget webTarget) {
 
 		// out of the EJB / CDI container the injected "log" is not available !
-		final java.util.logging.Logger clientLog = java.util.logging.Logger.getLogger(this.getClass().getName());
+		final java.util.logging.Logger clientLog = java.util.logging.Logger.getLogger(getClass().getName());
 		clientLog.info("Deployment URL : " + deploymentURL);
 		clientLog.info("Web target : " + webTarget);
 
 		// Get the test data through REST back again ...
-		final Response rs = resource.getOne("1");
-		assertEquals(Status.OK, rs.getStatusInfo());
+		final Response rs = resource.findById("1");
+		assertEquals(Response.Status.OK, rs.getStatusInfo());
 		assertTrue(rs.hasEntity());
 		final Conference d = rs.readEntity(Conference.class);
 		rs.close();
@@ -140,22 +139,21 @@ public class ConferenceRestServiceTest {
 	@Test
 	@InSequence(value = 20)
 	@RunAsClient
-	public void testGetOneWrongParam(
-			@ArquillianResteasyResource(ConferenceRestServiceTest.appPath) final ConferenceRestService resource) {
+	public void testGetOneWrongParam(@ArquillianResteasyResource(appPath) final ConferenceRestService resource) {
 
-		Response rs = resource.getOne("XYZ");
-		assertEquals(Status.BAD_REQUEST, rs.getStatusInfo());
+		Response rs = resource.findById("XYZ");
+		assertEquals(Response.Status.BAD_REQUEST, rs.getStatusInfo());
 		assertTrue(rs.hasEntity());
 		assertTrue(rs.readEntity(String.class).contains(
 				"\"message\":\"The id must be a valid decimal or hexadecimal number\",\"value\":\"XYZ\""));
 		rs.close();
 
-		rs = resource.getOne("xFFFFFF");
-		assertEquals(Status.NOT_FOUND, rs.getStatusInfo());
+		rs = resource.findById("xFFFFFF");
+		assertEquals(Response.Status.NOT_FOUND, rs.getStatusInfo());
 		rs.close();
 
-		rs = resource.getOne(""); // !!!!!!!!!!!!!!!!!! Translates actually to getAll() !!!!!!!!!!!!!!!!!!
-		assertEquals(Status.OK, rs.getStatusInfo());
+		rs = resource.findById(""); // !!!!!!!!!!!!!!!!!! Translates actually to getAll() !!!!!!!!!!!!!!!!!!
+		assertEquals(Response.Status.OK, rs.getStatusInfo());
 		assertTrue(rs.hasEntity());
 		final List<Conference> d = rs.readEntity(List.class);
 		assertEquals(2, d.size());
@@ -165,23 +163,24 @@ public class ConferenceRestServiceTest {
 	@Test
 	@InSequence(value = 30)
 	@RunAsClient
-	public void testGetAll(
-			@ArquillianResteasyResource(ConferenceRestServiceTest.appPath) final ConferenceRestService resource) {
+	public void testGetAll(@ArquillianResteasyResource(appPath) final ConferenceRestService resource) {
 
-		final List<Conference> all = resource.getAll();
+		final Response rs = resource.find("");
+		assertEquals(Response.Status.OK, rs.getStatusInfo());
+		assertTrue(rs.hasEntity());
+		final List<Conference> all = rs.readEntity(List.class);
 		assertEquals(2, all.size());
 	}
 
 	@Test
 	@InSequence(value = 40)
 	@RunAsClient
-	public void testDeleteNonExistent(
-			@ArquillianResteasyResource(ConferenceRestServiceTest.appPath) final ConferenceRestService resource) {
+	public void testDeleteNonExistent(@ArquillianResteasyResource(appPath) final ConferenceRestService resource) {
 
 		final Response rs = resource.delete("XFFFFFF");
-		assertEquals(Status.OK, rs.getStatusInfo());
+		assertEquals(Response.Status.OK, rs.getStatusInfo());
 		assertNotNull(rs.getLink("parent"));
-		assertEquals("/" + ArchiveProducer.APP + "/" + ConferenceRestServiceTest.appPath + "/"
+		assertEquals("/" + ArchiveProducer.APP + "/" + appPath + "/"
 				+ ConferenceRestService.PATH_COLLECTION, rs.getLink("parent").getUri().getPath());
 
 		rs.close();
@@ -190,35 +189,50 @@ public class ConferenceRestServiceTest {
 	@Test
 	@InSequence(value = 50)
 	@RunAsClient
-	public void testSaveNewEntity(
-			@ArquillianResteasyResource(ConferenceRestServiceTest.appPath) final ConferenceRestService resource) {
+	public void testSaveNewEntity(@ArquillianResteasyResource(appPath) final ConferenceRestService resource) {
 
 		final Conference c = new Conference();
-		// c.setName("Name 3");
+		c.setName(null); // The field is NotNull !
 		c.setDescription("description 3");
-		c.setFrom(new Date(10L * ConferenceRestServiceTest.DAY));
-		c.setTo(new Date(17L * ConferenceRestServiceTest.DAY));
+		c.setFrom(new Date(10L * DAY));
+		c.setTo(new Date(17L * DAY));
 
 		Response rs = resource.save(c);
-		assertEquals(Status.BAD_REQUEST, rs.getStatusInfo());
+		assertEquals(Response.Status.BAD_REQUEST, rs.getStatusInfo());
 		assertEquals("{\"!\":\"Constraint violation(s):\\nconference.name: may not be null\"}",
 				rs.readEntity(String.class));
 		rs.close();
 
 		c.setName("Name 3");
 		rs = resource.save(c);
-		assertEquals(Status.CREATED, rs.getStatusInfo());
+		assertEquals(Response.Status.CREATED, rs.getStatusInfo());
 		assertNotNull(rs.getLink("self"));
-		assertEquals("/" + ArchiveProducer.APP + "/" + ConferenceRestServiceTest.appPath + "/"
+		assertEquals("/" + ArchiveProducer.APP + "/" + appPath + "/"
 				+ ConferenceRestService.PATH_COLLECTION + "/3", rs.getLink("self").getUri().getPath());
 		rs.close();
 
-		rs = resource.getOne("3");
-		assertEquals(Status.OK, rs.getStatusInfo());
+		rs = resource.findById("3");
+		assertEquals(Response.Status.OK, rs.getStatusInfo());
 		assertTrue(rs.hasEntity());
 		final Conference d = rs.readEntity(Conference.class);
 		assertEquals(Long.valueOf(3), d.getId());
 		assertEquals("Name 3", d.getName());
+		rs.close();
+	}
+
+	@Test
+	@InSequence(value = 60)
+	@RunAsClient
+	public void testFindByQuery(@ArquillianResteasyResource(appPath) final ConferenceRestService resource) {
+
+		final String query = "name=='Name 1' and from >= 2015-01-01";
+
+		Response rs = resource.find(query);
+		assertEquals(Response.Status.OK, rs.getStatusInfo());
+		assertTrue(rs.hasEntity());
+		final List<Conference> all = rs.readEntity(List.class);
+		assertEquals(3, all.size());
+		assertEquals(query, rs.getHeaderString("query"));
 		rs.close();
 	}
 }

@@ -7,9 +7,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
-import javax.inject.Inject;
 
-import org.slf4j.Logger;
+import cz.jirutka.rsql.parser.ast.Node;
 import org.swa.conf.business.persistence.BasePersistenceService;
 import org.swa.conf.datatypes.AbstractDatatype;
 
@@ -21,12 +20,14 @@ public class BasePersistenceBean<T extends AbstractDatatype> implements BasePers
 
 	private final AtomicLong idGenerator = new AtomicLong(0);
 
-	@Inject
-	private Logger log;
-
 	@Override
 	public T findById(final Long id) {
 		return database.get(id);
+	}
+
+	@Override
+	public List<T> find(final Node queryAST) {
+		return findAll();
 	}
 
 	@Override

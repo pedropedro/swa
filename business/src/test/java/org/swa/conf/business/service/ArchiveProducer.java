@@ -21,6 +21,7 @@ public class ArchiveProducer {
 		war.addPackage(BasePersistenceService.class.getPackage());
 		war.addClass(EnvironmentEntriesHolder.class);
 		war.addClass(LoggerProducer.class);
+		war.addAsLibraries(pers.resolve("cz.jirutka.rsql:rsql-parser").withTransitivity().asFile());
 		war.addAsWebInfResource("empty-beans.xml", "beans.xml");
 		return war;
 	}

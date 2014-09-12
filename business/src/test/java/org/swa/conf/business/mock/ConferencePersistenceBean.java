@@ -10,6 +10,7 @@ import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Local;
 import javax.inject.Inject;
 
+import cz.jirutka.rsql.parser.ast.Node;
 import org.slf4j.Logger;
 import org.swa.conf.business.persistence.BasePersistenceService;
 import org.swa.conf.datatypes.Conference;
@@ -34,6 +35,11 @@ public class ConferencePersistenceBean implements BasePersistenceService<Confere
 		log.debug("{}ound using id {}", cc == null ? "Nothing f" : "F", id);
 
 		return cc == null ? null : new ConferenceCollection(cc);
+	}
+
+	@Override
+	public List<Conference> find(final Node queryAST) {
+		return findAll();
 	}
 
 	@Override

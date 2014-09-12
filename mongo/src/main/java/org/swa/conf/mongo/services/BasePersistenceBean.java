@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
+import cz.jirutka.rsql.parser.ast.Node;
 import org.jongo.MongoCollection;
 import org.slf4j.Logger;
 import org.swa.conf.business.persistence.BasePersistenceService;
@@ -52,6 +53,21 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 	public List<T> findAll() {
 
 		log.debug("Finding all {}s", genericClass.getSimpleName());
+
+		final List<T> l = new ArrayList<>();
+
+		for (final T t : getCollection().find().as(genericClass))
+			l.add(t);
+
+		log.debug("Found {} {}s", l.size(), genericClass.getSimpleName());
+
+		return l;
+	}
+
+	@Override
+	public List<T> find(Node queryAST) {
+
+		log.debug("Finding {}s", genericClass.getSimpleName());
 
 		final List<T> l = new ArrayList<>();
 

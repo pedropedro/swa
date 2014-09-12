@@ -8,13 +8,11 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.swa.conf.business.persistence.BasePersistenceService;
-import org.swa.conf.configuration.EnvironmentEntriesHolder;
 import org.swa.conf.datatypes.User;
 import org.swa.conf.mongo.producers.ArchiveProducer;
 import org.swa.conf.monitoring.MonitoringResource;
@@ -25,16 +23,8 @@ public class AnnotationInheritanceAndStatsCollectionTest {
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		final WebArchive war = ShrinkWrap.create(WebArchive.class, "conf-ejb.war");
-		war.addPackages(true, "org.swa.conf.mongo");
-		war.addPackages(false, "org.swa.conf.datatypes");
-		war.addPackages(false, "org.swa.conf.business.persistence");
+		final WebArchive war = ArchiveProducer.createMongoTestWebArchive();
 		war.addPackages(false, "org.swa.conf.monitoring");
-		war.addClass(EnvironmentEntriesHolder.class);
-		war.addAsLibraries(ArchiveProducer.pers.resolve("org.mongodb:mongo-java-driver").withTransitivity().asFile());
-		war.addAsLibraries(ArchiveProducer.pers.resolve("org.jongo:jongo").withTransitivity().asFile());
-		war.addAsLibraries(ArchiveProducer.pers.resolve("com.github.fakemongo:fongo").withTransitivity().asFile());
-		war.addAsWebInfResource("mongo-ejb-jar.xml", "ejb-jar.xml");
 		war.addAsWebInfResource("interceptor-beans.xml", "beans.xml");
 		System.out.println(war.toString(true));
 		return war;

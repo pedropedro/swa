@@ -28,6 +28,10 @@
 			<classifier>lite</classifier>
 			<version>1.9.2</version>
 		</dependency>
+		<dependency>
+			<groupId>cz.jirutka.rsql</groupId>
+			<artifactId>rsql-parser</artifactId>
+		</dependency>
 <!-- PROVIDED -->
 		<dependency>
 			<groupId>javax.ejb</groupId>

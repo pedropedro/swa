@@ -2,11 +2,14 @@ package org.swa.conf.business.persistence;
 
 import java.util.List;
 
+import cz.jirutka.rsql.parser.ast.Node;
 import org.swa.conf.datatypes.AbstractDatatype;
 
 public interface BasePersistenceService<T extends AbstractDatatype> {
 
 	public T findById(final Long id);
+
+	public List<T> find(Node queryAST);
 
 	public List<T> findAll();
 

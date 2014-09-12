@@ -1,8 +1,8 @@
 package org.swa.conf.business.access.rest.impl;
 
-import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Link;
@@ -41,15 +41,15 @@ public class ConferenceRestServiceBean implements ConferenceRestService {
 	private ModelValidator v;
 
 	@Override
-	public List<Conference> getAll() {
-		log.debug("getAll");
-		return s.findAll();
+	public Response find(@QueryParam("q") final String query) {
+		log.debug("find by: {}", query);
+		return Response.ok().entity(s.find(query)).header("query", query).links(getParentLink()).build();
 	}
 
 	@Override
-	public Response getOne(final String _id) {
+	public Response findById(final String _id) {
 
-		log.debug("getOne id:{}", _id);
+		log.debug("findById: {}", _id);
 		final Long id = StringToLong.decode(_id);
 
 		if (id != null) {

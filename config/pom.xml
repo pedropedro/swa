@@ -19,6 +19,12 @@
 				<artifactId>slf4j-api</artifactId>
 				<version>1.7.7</version>
 			</dependency>
+			<dependency>
+				<!-- https://github.com/jirutka/rsql-parser -->
+				<groupId>cz.jirutka.rsql</groupId>
+				<artifactId>rsql-parser</artifactId>
+				<version>2.0-SNAPSHOT</version>
+			</dependency>
 <!-- TEST -->
 			<dependency>
 				<groupId>junit</groupId>
@@ -206,5 +212,17 @@
 			<url>scp://local.company.com/websites/project.company.com/</url>
 		</site>
 	</distributionManagement>
+
+	<!-- temporary for the cz.jirutka.rsql:rsql-parser -->
+	<repositories>
+		<repository>
+			<id>sonatype-snapshots</id>
+			<name>Sonatype repository for deploying snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 </project>

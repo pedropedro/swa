@@ -22,6 +22,7 @@ public class ArchiveProducer {
 		war.addAsLibraries(pers.resolve("org.mongodb:mongo-java-driver").withTransitivity().asFile());
 		war.addAsLibraries(pers.resolve("org.jongo:jongo").withTransitivity().asFile());
 		war.addAsLibraries(pers.resolve("com.github.fakemongo:fongo").withTransitivity().asFile());
+		war.addAsLibraries(pers.resolve("cz.jirutka.rsql:rsql-parser").withTransitivity().asFile());
 		war.addAsWebInfResource("mongo-ejb-jar.xml", "ejb-jar.xml");
 		war.addAsWebInfResource("empty-beans.xml", "beans.xml");
 		System.out.println(war.toString(true));
