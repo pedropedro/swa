@@ -65,18 +65,8 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 	}
 
 	@Override
-	public List<T> find(Node queryAST) {
-
-		log.debug("Finding {}s", genericClass.getSimpleName());
-
-		final List<T> l = new ArrayList<>();
-
-		for (final T t : getCollection().find().as(genericClass))
-			l.add(t);
-
-		log.debug("Found {} {}s", l.size(), genericClass.getSimpleName());
-
-		return l;
+	public List<T> find(final Node queryAST) {
+		return find(queryAST.accept(new JongoRsqlVisitor()).toString());
 	}
 
 	@Override
@@ -103,6 +93,20 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 	@Override
 	public boolean exist(final Long id) {
 		return getCollection().count("{_id:#}", id) > 0;
+	}
+
+	protected List<T> find(final String nativeQuery) {
+
+		log.debug("Finding {}s using query {}", genericClass.getSimpleName(), nativeQuery);
+
+		final List<T> l = new ArrayList<>();
+
+		for (final T t : getCollection().find(nativeQuery).as(genericClass))
+			l.add(t);
+
+		log.debug("Found {} {}s", l.size(), genericClass.getSimpleName());
+
+		return l;
 	}
 
 	protected WriteResult _remove(final T t) {
