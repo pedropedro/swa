@@ -98,7 +98,7 @@ class JongoRsqlVisitor implements RSQLVisitor<StringBuilder, Void> {
 
 		sb.append("{").append(op).append(":[");
 
-		for (final Node child : node) sb.append(child.accept(this)).append(",");
+		for (final Node child : node) child.accept(this).append(",");
 
 		// remove last comma
 		sb.deleteCharAt(sb.length() - 1);
