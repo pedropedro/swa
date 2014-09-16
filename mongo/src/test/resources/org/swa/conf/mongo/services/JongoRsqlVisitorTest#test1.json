@@ -1,0 +1,7 @@
+{	"conference":
+	[
+		{ "_id": 10000000000, "name":"name1", "description":"desc1desc", "from":{"$date":"2000-01-01T00:00:00Z"} },
+		{ "_id": 20000000000, "name":"name2", "description":"desc2desc", "from":{"$date":"2100-01-01T00:00:00Z"} },
+		{ "_id": 30000000000, "name":"name3", "description":"desc3" }
+	]
+}

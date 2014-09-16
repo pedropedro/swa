@@ -2,6 +2,7 @@ package org.swa.conf.mongo.services;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cz.jirutka.rsql.parser.ast.AndNode;
@@ -29,6 +30,11 @@ class JongoRsqlVisitor implements RSQLVisitor<StringBuilder, Void> {
 	};
 	private static final Pattern JOKER_PATTERN = Pattern.compile("\\*");
 
+	// either ISODate YYYY-MM-DDTHH:MI:SS.SSSZ or simple date YYYY-MM-DD
+	private static final Pattern DATETIME_PATTERN = Pattern.compile("'(19|20)\\d\\d(-)(0[1-9]|1[012])\\2" +
+			"(0[1-9]|[12][0-9]|3[01])(T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{3})?)?Z?'");
+	private static final Pattern AFTER_SIMPLE_DATE_PATTERN = Pattern.compile("\'}");
+
 	private final StringBuilder sb;
 
 	JongoRsqlVisitor() {
@@ -55,7 +61,7 @@ class JongoRsqlVisitor implements RSQLVisitor<StringBuilder, Void> {
 		sb.append("{'").append(node.getSelector()).append("':");
 
 		final ComparisonOperator o = node.getOperator();
-		final String a = addApostrophes(node.getArguments().get(0));
+		final String a = parseArgument(node.getArguments().get(0));
 
 		if (RSQLOperators.EQUAL.equals(o)) {
 
@@ -71,7 +77,7 @@ class JongoRsqlVisitor implements RSQLVisitor<StringBuilder, Void> {
 
 				sb.append("[");
 
-				for (final String s : node.getArguments()) sb.append(addApostrophes(s)).append(",");
+				for (final String s : node.getArguments()) sb.append(parseArgument(s)).append(",");
 
 				// remove last comma
 				sb.deleteCharAt(sb.length() - 1);
@@ -81,17 +87,50 @@ class JongoRsqlVisitor implements RSQLVisitor<StringBuilder, Void> {
 			} else
 				sb.append(a);
 
-			sb.append("}");
+			sb.append("}}");
 		}
 
 		return sb;
 	}
 
-	private String addApostrophes(final String s) {
+	private String parseArgument(final String s) {
 
-		if (s.charAt(0) != '\'') return "'" + s + "'";
+		String ss = s;
 
-		return s;
+		if (ss.charAt(0) != '\'') ss = "'" + ss + "'";
+
+		final Matcher m = DATETIME_PATTERN.matcher(ss);
+
+		if (m.matches()) {
+
+			if (m.groupCount() != 7)
+				throw new IllegalStateException("Unexpected group count - date pattern changed ?");
+
+			/* for (int i = 0; i < m.groupCount(); i++) System.out.println(m.group(i));
+				'2000-01-01'
+				20
+				-
+				01
+				01
+				null
+				null
+
+				'2000-01-01T12:34:56.123Z'
+				20
+				-
+				01
+				01
+				T12:34:56.123
+				12
+			*/
+
+			ss = "{'$date':" + ss + "}";
+
+			if (m.group(5) == null) // simple date
+				ss = AFTER_SIMPLE_DATE_PATTERN.matcher(ss).replaceFirst("T00:00:00.000Z'}");
+		}
+
+		return ss;
 	}
 
 	private StringBuilder joinChildrenNodes(final LogicalNode node, final String op) {
