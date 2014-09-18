@@ -2,6 +2,7 @@ package org.swa.conf.business.access.rest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
@@ -25,7 +26,12 @@ public interface ConferenceRestService {
 
 	@GET
 	@Path(PATH_COLLECTION)
-	public Response find(@QueryParam("q") final String query);
+	public Response find(
+			@QueryParam("p") @DefaultValue("1") final Integer page,
+			@QueryParam("q") final String query,
+			@QueryParam("r") @DefaultValue("20") final Integer rowsOnPage,
+			@QueryParam("s") @QueryParamSortByValidator final String sortBy
+	);
 
 	@GET
 	@Path(PATH_ELEMENT)

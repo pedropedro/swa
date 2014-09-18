@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.swa.conf.business.persistence.BasePersistenceService;
 import org.swa.conf.datatypes.AbstractDatatype;
 import org.swa.conf.datatypes.Conference;
+import org.swa.conf.mongo.Utils;
 import org.swa.conf.mongo.collections.ConferenceCollection;
 import org.swa.conf.mongo.collections.LocationCollection;
 import org.swa.conf.mongo.collections.RoomCollection;
@@ -122,5 +123,35 @@ public class ConferencePersistenceBeanTest {
 		persistence.remove(c);
 		final Conference c4 = persistence.findById(c.getId());
 		Assert.assertNull(c4);
+	}
+
+	@Test
+	@InSequence(value = 30)
+	public void sortByTest() {
+
+		ConferenceCollection c = new ConferenceCollection();
+		c.setDescription("Description 1");
+		c.setFrom(Utils.parseDate("2000-06-01"));
+		c.setName("Name 1");
+		c.setTo(Utils.parseDate("2000-06-11"));
+		persistence.save(c);
+		c = new ConferenceCollection();
+		c.setDescription("Description 2");
+		c.setFrom(Utils.parseDate("2000-07-01"));
+		c.setName("Name 2");
+		c.setTo(Utils.parseDate("2000-07-11"));
+		persistence.save(c);
+		c = new ConferenceCollection();
+		c.setDescription("Description 2");
+		c.setFrom(Utils.parseDate("2000-08-01"));
+		c.setName("Name 3");
+		c.setTo(Utils.parseDate("2000-08-11"));
+		persistence.save(c);
+
+		final List<Conference> conferenceList = persistence.find(null, null, null, "description-name+");
+
+		for (Conference conf : conferenceList) {
+			System.out.println(conf);
+		}
 	}
 }

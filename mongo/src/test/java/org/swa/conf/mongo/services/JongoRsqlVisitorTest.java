@@ -63,37 +63,37 @@ public class JongoRsqlVisitorTest {
 		for (final DBObject dbo : localBeanDbReader.getCollection().getDBCollection().find())
 			log.debug("{}", dbo);
 
-		List<Conference> c = localBeanDbReader.find(new RSQLParser().parse("name==name1"));
+		List<Conference> c = localBeanDbReader.find(new RSQLParser().parse("name==name1"), null, null, null);
 		Assert.assertNotNull(c);
 		Assert.assertEquals(1, c.size());
 		Assert.assertEquals("name1", c.get(0).getName());
 
-		c = localBeanDbReader.find(new RSQLParser().parse("name==na*"));
+		c = localBeanDbReader.find(new RSQLParser().parse("name==na*"), null, null, null);
 		Assert.assertNotNull(c);
 		Assert.assertEquals(3, c.size());
 
-		c = localBeanDbReader.find(new RSQLParser().parse("from > 2000-01-01"));
+		c = localBeanDbReader.find(new RSQLParser().parse("from > 2000-01-01"), null, null, null);
 		Assert.assertNotNull(c);
 		System.out.println(c);
 		Assert.assertEquals(1, c.size());
 		Assert.assertEquals("name2", c.get(0).getName());
 
-		c = localBeanDbReader.find(new RSQLParser().parse("from > 2000-01-01T12:34:56.123Z"));
+		c = localBeanDbReader.find(new RSQLParser().parse("from > 2000-01-01T12:34:56.123Z"), null, null, null);
 		Assert.assertNotNull(c);
 		System.out.println(c);
 		Assert.assertEquals(1, c.size());
 		Assert.assertEquals("name2", c.get(0).getName());
 
-		c = localBeanDbReader.find(new RSQLParser().parse("from == 2000-01-01"));
+		c = localBeanDbReader.find(new RSQLParser().parse("from == 2000-01-01"), null, null, null);
 		Assert.assertNotNull(c);
 		System.out.println(c);
 		Assert.assertEquals(1, c.size());
 		Assert.assertEquals("name1", c.get(0).getName());
 
-		c = localBeanDbReader.find(new RSQLParser().parse("from != 2000-01-01"));
+		c = localBeanDbReader.find(new RSQLParser().parse("from != 2000-01-01"), null, null, null);
 		Assert.assertNotNull(c);
 		System.out.println(c);
 		Assert.assertEquals(2, c.size());
-		for (Conference conference : c) Assert.assertNotEquals("name1", conference.getName());
+		for (final Conference conference : c) Assert.assertNotEquals("name1", conference.getName());
 	}
 }

@@ -165,7 +165,7 @@ public class ConferenceRestServiceTest {
 	@RunAsClient
 	public void testGetAll(@ArquillianResteasyResource(appPath) final ConferenceRestService resource) {
 
-		final Response rs = resource.find("");
+		final Response rs = resource.find(null, null, null, null);
 		assertEquals(Response.Status.OK, rs.getStatusInfo());
 		assertTrue(rs.hasEntity());
 		final List<Conference> all = rs.readEntity(List.class);
@@ -192,8 +192,8 @@ public class ConferenceRestServiceTest {
 	public void testSaveNewEntity(@ArquillianResteasyResource(appPath) final ConferenceRestService resource) {
 
 		final Conference c = new Conference();
-		c.setName(null); // The field is NotNull !
-		c.setDescription("description 3");
+		c.setName(null); // The field is @NotNull !
+		c.setDescription("description 2"); // second row with such a description
 		c.setFrom(new Date(10L * DAY));
 		c.setTo(new Date(17L * DAY));
 
@@ -227,12 +227,26 @@ public class ConferenceRestServiceTest {
 
 		final String query = "name=='Name 1' and from >= 2015-01-01";
 
-		Response rs = resource.find(query);
+		Response rs = resource.find(null, query, null, null);
+		assertEquals(Response.Status.OK, rs.getStatusInfo());
+		assertTrue(rs.hasEntity());
+		List<Conference> all = rs.readEntity(List.class);
+		assertEquals(3, all.size());
+		assertEquals(query, rs.getHeaderString("query"));
+		rs.close();
+	}
+
+	@Test
+	@InSequence(value = 70)
+	@RunAsClient
+	public void testFindWithSort(@ArquillianResteasyResource(appPath) final ConferenceRestService resource) {
+
+		final Response rs = resource.find(null, null, null, "-description+name");
 		assertEquals(Response.Status.OK, rs.getStatusInfo());
 		assertTrue(rs.hasEntity());
 		final List<Conference> all = rs.readEntity(List.class);
 		assertEquals(3, all.size());
-		assertEquals(query, rs.getHeaderString("query"));
+		assertEquals("N/A", rs.getHeaderString("query"));
 		rs.close();
 	}
 }

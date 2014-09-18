@@ -26,7 +26,7 @@ public class BasePersistenceBean<T extends AbstractDatatype> implements BasePers
 	}
 
 	@Override
-	public List<T> find(final Node queryAST) {
+	public List<T> find(final Node queryAST, final Integer skip, final Integer limit, final String sortBy) {
 		return findAll();
 	}
 

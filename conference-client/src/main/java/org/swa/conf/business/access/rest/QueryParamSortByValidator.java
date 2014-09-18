@@ -8,19 +8,17 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Constraint(validatedBy = {})
-@NotNull
-@Pattern(regexp = "[-0-9]*|[xX][0-9a-fA-F]*")
+@Pattern(regexp = "([0-9a-zA-Z_]+[-+])*")
 @ReportAsSingleViolation
 @Documented
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PathParamIdValidator {
+public @interface QueryParamSortByValidator {
 
-	String message() default "{invalid.id}";
+	String message() default "{invalid.sortBy}";
 
 	Class<?>[] groups() default {};
 

@@ -2,11 +2,13 @@ package org.swa.conf.mongo.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 import cz.jirutka.rsql.parser.ast.Node;
+import org.jongo.Find;
 import org.jongo.MongoCollection;
 import org.slf4j.Logger;
 import org.swa.conf.business.persistence.BasePersistenceService;
@@ -65,8 +67,8 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 	}
 
 	@Override
-	public List<T> find(final Node queryAST) {
-		return find(queryAST.accept(new JongoRsqlVisitor()).toString());
+	public List<T> find(final Node queryAST, final Integer skip, final Integer limit, final String sortBy) {
+		return find(queryAST == null ? "" : queryAST.accept(new JongoRsqlVisitor()).toString(), skip, limit, sortBy);
 	}
 
 	@Override
@@ -95,13 +97,43 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 		return getCollection().count("{_id:#}", id) > 0;
 	}
 
-	protected List<T> find(final String nativeQuery) {
+	private static final Pattern SORT_PATTERN = Pattern.compile("[+-]");
+
+	protected List<T> find(final String nativeQuery, final Integer skip, final Integer limit, final String sortBy) {
 
 		log.debug("Finding {}s using query {}", genericClass.getSimpleName(), nativeQuery);
 
 		final List<T> l = new ArrayList<>();
 
-		for (final T t : getCollection().find(nativeQuery).as(genericClass))
+		Find find = getCollection().find(nativeQuery);
+		if (skip != null) find = find.skip(skip);
+		if (limit != null) find = find.limit(limit);
+		if (sortBy != null) {
+
+			int ptr = 0;
+			final String[] fields = SORT_PATTERN.split(sortBy);
+
+			if (fields.length == 0)
+				throw new IllegalArgumentException("Parameter 's' (sort by) not of form field1[+|-]field2[+|-]...");
+
+			final StringBuilder sb = new StringBuilder(32);
+			sb.append("{");
+
+			for (int f = 0; f < fields.length; f++) {
+
+				if (f > 0) sb.append(",");
+
+				sb.append(fields[f]).append(":"); // field:
+
+				ptr += fields[f].length();
+
+				sb.append(sortBy.charAt(ptr++)).append("1"); // -1 for descending
+			}
+			sb.append("}");
+			find = find.sort(sb.toString());
+		}
+
+		for (final T t : find.as(genericClass))
 			l.add(t);
 
 		log.debug("Found {} {}s", l.size(), genericClass.getSimpleName());

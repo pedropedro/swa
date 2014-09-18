@@ -9,7 +9,7 @@ public interface BasePersistenceService<T extends AbstractDatatype> {
 
 	public T findById(final Long id);
 
-	public List<T> find(Node queryAST);
+	public List<T> find(Node queryAST, Integer skip, Integer limit, String sortBy);
 
 	public List<T> findAll();
 

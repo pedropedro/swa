@@ -2,7 +2,6 @@ package org.swa.conf.business.access.rest.impl;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Link;
@@ -41,9 +40,14 @@ public class ConferenceRestServiceBean implements ConferenceRestService {
 	private ModelValidator v;
 
 	@Override
-	public Response find(@QueryParam("q") final String query) {
-		log.debug("find by: {}", query);
-		return Response.ok().entity(s.find(query)).header("query", query).links(getParentLink()).build();
+	public Response find(final Integer page, final String query, final Integer rowsOnPage, final String sortBy) {
+		log.debug("find by: page={} rows={}, sort={}, query={}", page, rowsOnPage, sortBy, query);
+		return Response.ok().entity(s.find(query, page, rowsOnPage, sortBy))
+				.header("page", page)
+				.header("query", query == null ? "N/A" : query)
+				.header("rowsOnPage", rowsOnPage)
+				.header("sortBy", sortBy == null ? "N/A" : sortBy)
+				.links(getParentLink()).build();
 	}
 
 	@Override

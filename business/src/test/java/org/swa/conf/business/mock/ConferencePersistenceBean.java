@@ -38,7 +38,7 @@ public class ConferencePersistenceBean implements BasePersistenceService<Confere
 	}
 
 	@Override
-	public List<Conference> find(final Node queryAST) {
+	public List<Conference> find(final Node queryAST, final Integer skip, final Integer limit, final String sortBy) {
 		return findAll();
 	}
 

@@ -33,7 +33,7 @@ class JongoRsqlVisitor implements RSQLVisitor<StringBuilder, Void> {
 	// either ISODate YYYY-MM-DDTHH:MI:SS.SSSZ or simple date YYYY-MM-DD
 	private static final Pattern DATETIME_PATTERN = Pattern.compile("'(19|20)\\d\\d(-)(0[1-9]|1[012])\\2" +
 			"(0[1-9]|[12][0-9]|3[01])(T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{3})?)?Z?'");
-	private static final Pattern AFTER_SIMPLE_DATE_PATTERN = Pattern.compile("\'}");
+	private static final Pattern AFTER_SIMPLE_DATE_PATTERN = Pattern.compile("'}");
 
 	private final StringBuilder sb;
 

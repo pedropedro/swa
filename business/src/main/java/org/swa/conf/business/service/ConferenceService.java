@@ -24,19 +24,25 @@ public class ConferenceService {
 		return persistence.findById(id);
 	}
 
-	public List<Conference> find(String query) {
+	public List<Conference> find(final String query, final Integer page, final Integer rowsOnPage,
+			final String sortBy) {
 
-		if (query == null || query.isEmpty()) {
-			// check security
-			return persistence.findAll();
-		}
+		if (page != null && page < 1)
+			throw new IllegalArgumentException("Parameter 'p' (page) must be from range <1..2147483647>");
 
-		Node queryAST = new RSQLParser().parse(query);
+		if (rowsOnPage != null && rowsOnPage < 1)
+			throw new IllegalArgumentException("Parameter 'r' (rows pro page) must be from range <1..2147483647>");
+
+
+		final Node queryAST = query == null || query.trim().isEmpty() ? null : new RSQLParser().parse(query);
 
 		// check query actual parameters in context of logged in user
 		// ...
 
-		return persistence.find(queryAST);
+		final Integer skip = page == null || rowsOnPage == null ? null : (page - 1) * rowsOnPage;
+		final Integer limit = page == null || rowsOnPage == null ? null : rowsOnPage;
+
+		return persistence.find(queryAST, skip, limit, sortBy);
 	}
 
 	public Conference save(final Conference t) {
