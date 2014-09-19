@@ -15,11 +15,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.swa.conf.datatypes.Conference;
+import org.swa.conf.datatypes.validators.Range;
 
 @Path("")
 @Produces({MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_JSON})
-public interface ConferenceRestService {
+public interface ConferenceRestService extends BaseRestService {
 
 	final String PATH_COLLECTION = "conferences";
 	final String PATH_ELEMENT = PATH_COLLECTION + "/{id}";
@@ -27,10 +28,12 @@ public interface ConferenceRestService {
 	@GET
 	@Path(PATH_COLLECTION)
 	public Response find(
-			@QueryParam("p") @DefaultValue("1") final Integer page,
-			@QueryParam("q") final String query,
-			@QueryParam("r") @DefaultValue("20") final Integer rowsOnPage,
-			@QueryParam("s") @QueryParamSortByValidator final String sortBy
+			@QueryParam(QRY_PARAM_PAGE) @DefaultValue("1") @Range(min = "1", context = "parameter '" + QRY_PARAM_PAGE
+					+ "' (page)") Integer page,
+			@QueryParam(QRY_PARAM_ROWS) @DefaultValue("20") @Range(min = "1", context = "parameter '" + QRY_PARAM_ROWS
+					+ "' (rows)") Integer rows,
+			@QueryParam(QRY_PARAM_SORT) @QueryParamSortByValidator String sortBy,
+			@QueryParam(QRY_PARAM_QUERY) String query
 	);
 
 	@GET

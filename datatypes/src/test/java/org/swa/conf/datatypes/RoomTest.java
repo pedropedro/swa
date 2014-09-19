@@ -104,14 +104,14 @@ public class RoomTest {
 			fail("Expected validation exception");
 		} catch (final ValidationException e) {
 			assertTrue(e.getMessage(), e.getMessage().endsWith(
-					"\n" + "cloneableroom.dbl: value (screwed) must be within range 1 to 10.0"));
+					"\n" + "cloneableroom.dbl: value of the member dbl must be within range 1 to 10.0"));
 		}
 		try {
 			validator.validate(r.setDbl(10.000000000000001));
 			fail("Expected validation exception");
 		} catch (final ValidationException e) {
 			assertTrue(e.getMessage(), e.getMessage().endsWith(
-					"\n" + "cloneableroom.dbl: value (screwed) must be within range 1 to 10.0"));
+					"\n" + "cloneableroom.dbl: value of the member dbl must be within range 1 to 10.0"));
 		}
 	}
 

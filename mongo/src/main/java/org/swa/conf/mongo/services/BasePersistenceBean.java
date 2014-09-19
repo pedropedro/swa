@@ -68,7 +68,7 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 
 	@Override
 	public List<T> find(final Node queryAST, final Integer skip, final Integer limit, final String sortBy) {
-		return find(queryAST == null ? "" : queryAST.accept(new JongoRsqlVisitor()).toString(), skip, limit, sortBy);
+		return find(getNativeQuery(queryAST), skip, limit, sortBy);
 	}
 
 	@Override
@@ -97,6 +97,11 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 		return getCollection().count("{_id:#}", id) > 0;
 	}
 
+	@Override
+	public long count(final Node queryAST) {
+		return getCollection().count(getNativeQuery(queryAST));
+	}
+
 	private static final Pattern SORT_PATTERN = Pattern.compile("[+-]");
 
 	protected List<T> find(final String nativeQuery, final Integer skip, final Integer limit, final String sortBy) {
@@ -106,8 +111,8 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 		final List<T> l = new ArrayList<>();
 
 		Find find = getCollection().find(nativeQuery);
-		if (skip != null) find = find.skip(skip);
-		if (limit != null) find = find.limit(limit);
+		if (skip != null) find = find.skip(skip < 0 ? 0 : skip); // mongoDB dislikes negative skips
+		if (limit != null) find = find.limit(limit); // negative == positive, 0 == no limit
 		if (sortBy != null) {
 
 			int ptr = 0;
@@ -186,5 +191,9 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 
 	private Long getId() {
 		return (System.nanoTime() & NANO_MASK) | (System.currentTimeMillis() << NANO_SHIFT);
+	}
+
+	private String getNativeQuery(final Node queryAST) {
+		return queryAST == null ? "" : queryAST.accept(new JongoRsqlVisitor()).toString();
 	}
 }

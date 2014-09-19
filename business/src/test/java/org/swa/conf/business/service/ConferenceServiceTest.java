@@ -21,6 +21,7 @@ public class ConferenceServiceTest {
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		final WebArchive war = ArchiveProducer.createTestWebArchive();
+		war.addClass(BaseService.class);
 		war.addClass(ConferenceService.class);
 		war.addClass(ConferenceServiceTest.class);
 		war.addClass(ConferenceCollection.class);

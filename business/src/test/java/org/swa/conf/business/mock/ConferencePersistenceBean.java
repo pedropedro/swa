@@ -76,4 +76,9 @@ public class ConferencePersistenceBean implements BasePersistenceService<Confere
 	public boolean exist(final Long id) {
 		return database.containsKey(id);
 	}
+
+	@Override
+	public long count(final Node queryAST) {
+		return database.size();
+	}
 }

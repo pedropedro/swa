@@ -11,7 +11,7 @@ class CloneableRoom extends Room {
 	private double dbl;
 	private AtomicInteger ai;
 
-	@Range(min = "1", max = "10.0", messageScrewed = true)
+	@Range(min = "1", max = "10.0", context = "member dbl")
 	double getDbl() {
 		return dbl;
 	}

@@ -56,7 +56,7 @@ public class JongoRsqlVisitorTest {
 
 	@Test
 	@InSequence(value = 20)
-	public void fongoQueryTest() {
+	public void jongoQueryTest() {
 
 		l.load("conference", DataLoader.Strategy.SET, "test1");
 

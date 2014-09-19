@@ -25,6 +25,7 @@ import org.swa.conf.business.access.rest.impl.EJBExceptionMapper;
 import org.swa.conf.business.mock.ConferenceCollection;
 import org.swa.conf.business.mock.ConferencePersistenceBean;
 import org.swa.conf.business.service.ArchiveProducer;
+import org.swa.conf.business.service.BaseService;
 import org.swa.conf.business.service.ConferenceService;
 import org.swa.conf.datatypes.Conference;
 import org.swa.conf.datatypes.Location;
@@ -42,8 +43,9 @@ public class ConferenceRestServiceTest {
 		final WebArchive war = ArchiveProducer.createTestWebArchive();
 		war.addClasses(ApplicationPath.class, EJBExceptionMapper.class, StringToLong.class);
 		war.addClasses(ModelValidator.class, ValidationException.class, PathParamIdValidator.class);
-		war.addClasses(ConferenceService.class, ConferencePersistenceBean.class, ConferenceCollection.class);
-		war.addClasses(ConferenceRestService.class, ConferenceRestServiceBean.class);
+		war.addClasses(BaseService.class, ConferenceService.class, ConferencePersistenceBean.class,
+				ConferenceCollection.class);
+		war.addClasses(BaseRestService.class, ConferenceRestService.class, ConferenceRestServiceBean.class);
 		war.addAsWebInfResource("ejb-jar.xml");
 		war.addAsResource("ValidationMessages.properties");
 		System.out.println(war.toString(true));
@@ -227,12 +229,15 @@ public class ConferenceRestServiceTest {
 
 		final String query = "name=='Name 1' and from >= 2015-01-01";
 
-		Response rs = resource.find(null, query, null, null);
+		final Response rs = resource.find(null, null, null, query);
 		assertEquals(Response.Status.OK, rs.getStatusInfo());
 		assertTrue(rs.hasEntity());
-		List<Conference> all = rs.readEntity(List.class);
+		final List<Conference> all = rs.readEntity(List.class);
 		assertEquals(3, all.size());
-		assertEquals(query, rs.getHeaderString("query"));
+		assertEquals(query, rs.getLink("next").getParams().get(BaseRestService.QRY_PARAM_QUERY));
+		assertEquals("1", rs.getLink("next").getParams().get(BaseRestService.QRY_PARAM_PAGE));
+		assertEquals(query, rs.getLink("prev").getParams().get(BaseRestService.QRY_PARAM_QUERY));
+		assertEquals("1", rs.getLink("prev").getParams().get(BaseRestService.QRY_PARAM_PAGE));
 		rs.close();
 	}
 
@@ -241,12 +246,11 @@ public class ConferenceRestServiceTest {
 	@RunAsClient
 	public void testFindWithSort(@ArquillianResteasyResource(appPath) final ConferenceRestService resource) {
 
-		final Response rs = resource.find(null, null, null, "-description+name");
+		final Response rs = resource.find(null, null, "-description+name", null);
 		assertEquals(Response.Status.OK, rs.getStatusInfo());
 		assertTrue(rs.hasEntity());
 		final List<Conference> all = rs.readEntity(List.class);
 		assertEquals(3, all.size());
-		assertEquals("N/A", rs.getHeaderString("query"));
 		rs.close();
 	}
 }

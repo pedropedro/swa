@@ -12,7 +12,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
-/** Numeric value in a range &ltmin ; max&gt */
+/** Numeric value in a range < min ; max > */
 @Constraint(validatedBy = {Range.RangeValidator.class})
 @Documented
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
@@ -26,8 +26,11 @@ public @interface Range {
 
 	String max() default "";
 
-	/** @see ValidationMessages.properties */
-	boolean messageScrewed() default false;
+	/**
+	 * Identification of an object guarded by this constraint, example: "parameter X" - this text will be used by
+	 * building the error message, for example: "value of the parameter X must be within range {min} to {max}"
+	 */
+	String context() default "";
 
 	Class<?>[] groups() default {};
 
@@ -39,12 +42,13 @@ public @interface Range {
 		private BigDecimal max;
 		private boolean openInterval;
 
+		private static final BigDecimal MIN = BigDecimal.valueOf(-Double.MAX_VALUE);
+		private static final BigDecimal MAX = BigDecimal.valueOf(Double.MAX_VALUE);
+
 		@Override
 		public void initialize(final Range r) {
-			min = r.min().isEmpty() ? BigDecimal.valueOf(-Double.MAX_VALUE) : new BigDecimal(r.min())
-					.stripTrailingZeros();
-			max = r.max().isEmpty() ? BigDecimal.valueOf(Double.MAX_VALUE) : new BigDecimal(r.max())
-					.stripTrailingZeros();
+			min = r.min().isEmpty() ? MIN : new BigDecimal(r.min()).stripTrailingZeros();
+			max = r.max().isEmpty() ? MAX : new BigDecimal(r.max()).stripTrailingZeros();
 			openInterval = r.min().isEmpty() && r.max().isEmpty();
 		}
 
@@ -57,7 +61,7 @@ public @interface Range {
 			if (openInterval)
 				return true;
 
-			BigDecimal N;
+			final BigDecimal N;
 
 			if (n instanceof BigDecimal)
 				N = (BigDecimal) n;
@@ -81,13 +85,7 @@ public @interface Range {
 				return false;
 			}
 
-			if (N.compareTo(min) < 0)
-				return false;
-
-			if (N.compareTo(max) > 0)
-				return false;
-
-			return true;
+			return N.compareTo(min) >= 0 && N.compareTo(max) <= 0;
 		}
 	}
 }

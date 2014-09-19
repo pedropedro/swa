@@ -13,6 +13,7 @@ import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.swa.conf.business.access.rest.ConferenceRestService;
 import org.swa.conf.business.access.rest.StringToLong;
+import org.swa.conf.business.service.BaseService;
 import org.swa.conf.business.service.ConferenceService;
 import org.swa.conf.datatypes.Conference;
 import org.swa.conf.datatypes.validators.ModelValidator;
@@ -40,14 +41,14 @@ public class ConferenceRestServiceBean implements ConferenceRestService {
 	private ModelValidator v;
 
 	@Override
-	public Response find(final Integer page, final String query, final Integer rowsOnPage, final String sortBy) {
+	public Response find(final Integer page, final Integer rowsOnPage, final String sortBy, final String query) {
 		log.debug("find by: page={} rows={}, sort={}, query={}", page, rowsOnPage, sortBy, query);
-		return Response.ok().entity(s.find(query, page, rowsOnPage, sortBy))
-				.header("page", page)
-				.header("query", query == null ? "N/A" : query)
-				.header("rowsOnPage", rowsOnPage)
-				.header("sortBy", sortBy == null ? "N/A" : sortBy)
-				.links(getParentLink()).build();
+		final BaseService.FindResult frs = s.find(query, page, rowsOnPage, sortBy);
+		return Response.ok().entity(frs.getRows()).links(
+				getPrevNextLink("prev", "" + (page < 2 ? 1 : page - 1), rowsOnPage.toString(), sortBy, query),
+				getParentLink(),
+				getPrevNextLink("next", "" + (frs.hasNext() ? page + 1 : page), rowsOnPage.toString(), sortBy, query)
+		).header("hasNext", frs.hasNext()).build();
 	}
 
 	@Override
@@ -115,15 +116,31 @@ public class ConferenceRestServiceBean implements ConferenceRestService {
 	// ------------------------------------------------------------
 	// HATEOAS - propose the client little navigation possibilities
 	// ------------------------------------------------------------
+	private String getBaseUri() {
+		return ctx.getBaseUri().getPath() + ConferenceRestService.PATH_COLLECTION;
+	}
+
 	private Link getSelfLink(final Long id) {
-		return Link.fromPath(ctx.getBaseUri().getPath() + ConferenceRestService.PATH_COLLECTION + "/" + id).rel("self")
-				.type(MediaType.APPLICATION_JSON).build();
+		return Link.fromPath(getBaseUri() + "/" + id).rel("self").type(MediaType.APPLICATION_JSON).build();
 	}
 
 	private Link getParentLink() {
 		// log.debug(ctx.getBaseUri().getPath());// /business-ejb/
 		// log.debug(Link.fromMethod(ConferenceRestService.class, "getAll").build().getUri().getPath());// conferences
-		return Link.fromPath(ctx.getBaseUri().getPath() + ConferenceRestService.PATH_COLLECTION).rel("parent")
-				.type(MediaType.APPLICATION_JSON).build();
+		return Link.fromPath(getBaseUri()).rel("parent").type(MediaType.APPLICATION_JSON).build();
+	}
+
+	private Link getPrevNextLink(final String relation, final String page, final String rows, final String sortBy,
+			final String query) {
+
+		final Link.Builder b = Link.fromPath(getBaseUri()).rel(relation).type(MediaType.APPLICATION_JSON);
+
+		b.param(QRY_PARAM_PAGE, page).param(QRY_PARAM_ROWS, rows);
+
+		if (sortBy != null) b.param(QRY_PARAM_SORT, sortBy);
+
+		if (query != null) b.param(QRY_PARAM_QUERY, query);
+
+		return b.build();
 	}
 }

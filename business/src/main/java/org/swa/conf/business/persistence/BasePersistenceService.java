@@ -11,6 +11,8 @@ public interface BasePersistenceService<T extends AbstractDatatype> {
 
 	public List<T> find(Node queryAST, Integer skip, Integer limit, String sortBy);
 
+	public long count(Node queryAST);
+
 	public List<T> findAll();
 
 	public T save(final T t);
