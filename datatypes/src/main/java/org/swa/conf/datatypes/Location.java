@@ -11,20 +11,20 @@ public class Location extends AbstractDatatype {
 
 	private static final long serialVersionUID = 1L;
 
-	private String city;
-	private String street;
+	private String name;
+	private String address;
 	private Double latitude;
 	private Double longitude;
 	private List<? extends Room> rooms;
 
 	@NotNull
-	public String getCity() {
-		return city;
+	public String getName() {
+		return name;
 	}
 
 	@NotNull
-	public String getStreet() {
-		return street;
+	public String getAddress() {
+		return address;
 	}
 
 	@GeoLatitude
@@ -45,13 +45,13 @@ public class Location extends AbstractDatatype {
 		return rooms;
 	}
 
-	public Location setCity(final String city) {
-		this.city = city;
+	public Location setName(final String name) {
+		this.name = name;
 		return this;
 	}
 
-	public Location setStreet(final String street) {
-		this.street = street;
+	public Location setAddress(final String address) {
+		this.address = address;
 		return this;
 	}
 
@@ -74,11 +74,11 @@ public class Location extends AbstractDatatype {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((city == null) ? 0 : city.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((latitude == null) ? 0 : latitude.hashCode());
 		result = prime * result + ((longitude == null) ? 0 : longitude.hashCode());
 		result = prime * result + ((rooms == null) ? 0 : rooms.hashCode());
-		result = prime * result + ((street == null) ? 0 : street.hashCode());
+		result = prime * result + ((address == null) ? 0 : address.hashCode());
 		return result;
 	}
 
@@ -92,10 +92,10 @@ public class Location extends AbstractDatatype {
 		if (!(obj instanceof Location))
 			return false;
 		final Location other = (Location) obj;
-		if (city == null) {
-			if (other.city != null)
+		if (name == null) {
+			if (other.name != null)
 				return false;
-		} else if (!city.equals(other.city))
+		} else if (!name.equals(other.name))
 			return false;
 		if (latitude == null) {
 			if (other.latitude != null)
@@ -112,10 +112,10 @@ public class Location extends AbstractDatatype {
 				return false;
 		} else if (!rooms.equals(other.rooms))
 			return false;
-		if (street == null) {
-			if (other.street != null)
+		if (address == null) {
+			if (other.address != null)
 				return false;
-		} else if (!street.equals(other.street))
+		} else if (!address.equals(other.address))
 			return false;
 		return true;
 	}
@@ -125,10 +125,10 @@ public class Location extends AbstractDatatype {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Location [id=");
 		builder.append(getId());
-		builder.append(", city=");
-		builder.append(city);
-		builder.append(", street=");
-		builder.append(street);
+		builder.append(", name=");
+		builder.append(name);
+		builder.append(", address=");
+		builder.append(address);
 		builder.append(", latitude=");
 		builder.append(latitude);
 		builder.append(", longitude=");

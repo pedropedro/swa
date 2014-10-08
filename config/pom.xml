@@ -20,6 +20,11 @@
 				<version>1.7.7</version>
 			</dependency>
 			<dependency>
+				<groupId>com.cedarsoftware</groupId>
+				<artifactId>json-io</artifactId>
+				<version>2.7.1</version>
+			</dependency>
+			<dependency>
 				<!-- https://github.com/jirutka/rsql-parser -->
 				<groupId>cz.jirutka.rsql</groupId>
 				<artifactId>rsql-parser</artifactId>
@@ -110,6 +115,12 @@
 				<groupId>javax.mail</groupId>
 				<artifactId>javax.mail-api</artifactId>
 				<version>1.5.2</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>3.0.1</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>

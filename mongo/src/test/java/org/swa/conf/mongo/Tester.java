@@ -79,15 +79,15 @@ public class Tester {
 
 		final LocationCollection l = new LocationCollection();
 		l.setId(1L);
-		l.setCity("Sin");
+		l.setName("Sin");
 		l.setLatitude(66.66);
 		l.setLongitude(6.6);
-		l.setStreet("Abc Str");
+		l.setAddress("Abc Str");
 		l.setRooms(rooms);
 
 		final ConferenceCollection c = new ConferenceCollection();
 		c.setId(1L);
-		c.setCity(l);
+		c.setLocation(l);
 		c.setDescription("Conference description");
 		c.setFrom(new Date());
 		c.setName("Conference name");

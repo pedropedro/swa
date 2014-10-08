@@ -64,8 +64,8 @@ public class ConferenceRestServiceTest {
 
 		final Location l = new Location();
 		l.setId(11L);
-		l.setCity("city");
-		l.setStreet("street");
+		l.setName("city");
+		l.setAddress("street");
 
 		final List<Talk> talks = new ArrayList<>();
 		Talk t = new Talk();
@@ -86,7 +86,7 @@ public class ConferenceRestServiceTest {
 		c.setDescription("description 1");
 		c.setFrom(new Date(0));
 		c.setTo(new Date(5L * DAY));
-		c.setCity(l);
+		c.setLocation(l);
 		c.setTalks(talks);
 		s.save(c);
 		assertEquals(Long.valueOf(1L), c.getId());

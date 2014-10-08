@@ -69,22 +69,22 @@ public class ConferencePersistenceBeanTest {
 
 		final LocationCollection l = new LocationCollection();
 		l.setId(1L);
-		l.setCity("Sin");
+		l.setName("Sin");
 		l.setLatitude(66.66);
 		l.setLongitude(6.6);
-		l.setStreet("Abc Str");
+		l.setAddress("Abc Str");
 		l.setRooms(rooms);
 
 		final ConferenceCollection c = new ConferenceCollection();
 		c.setId(null);
-		c.setCity(l);
+		c.setLocation(l);
 		c.setDescription("Conference description");
 		c.setFrom(new Date());
 		c.setName("Conference name");
 		c.setTalks(talks);
 		c.setTo(new Date());
 
-		Assert.assertNotNull(c.getCity().getId());
+		Assert.assertNotNull(c.getLocation().getId());
 		for (final org.swa.conf.datatypes.Talk tt : c.getTalks()) {
 			Assert.assertNotNull(tt.getId());
 			for (final AbstractDatatype ad : tt.getRooms())

@@ -28,6 +28,16 @@
 			<artifactId>management</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.cedarsoftware</groupId>
+			<artifactId>json-io</artifactId>
+		</dependency>
+<!-- PROVIDED -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -58,6 +68,7 @@
 				</dependency>
 			</dependencies>
 		</profile>
+		<!--
 		<profile>
 			<id>persistence-jpa</id>
 			<dependencies>
@@ -68,5 +79,6 @@
 				</dependency>
 			</dependencies>
 		</profile>
+		-->
 	</profiles>
 </project>

@@ -29,8 +29,8 @@ public class LocationTest {
 
 		final CloneableLocation l = new CloneableLocation();
 		l.setId(1l);
-		l.setCity("city");
-		l.setStreet("street");
+		l.setName("city");
+		l.setAddress("street");
 		l.setLongitude(180d);
 
 		validator.validate(l);

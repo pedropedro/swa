@@ -8,11 +8,11 @@ class CloneableLocation extends Location {
 	public Location clone() {
 		final Location o = new Location();
 		o.setId(getId());
-		o.setCity(getCity());
+		o.setName(getName());
 		o.setLatitude(getLatitude());
 		o.setLongitude(getLongitude());
 		o.setRooms(getRooms());
-		o.setStreet(getStreet());
+		o.setAddress(getAddress());
 
 		return o;
 	}

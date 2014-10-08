@@ -8,7 +8,7 @@ class CloneableConference extends Conference {
 	public Conference clone() {
 		final Conference o = new Conference();
 		o.setId(getId());
-		o.setCity(getCity());
+		o.setLocation(getLocation());
 		o.setDescription(getDescription());
 		o.setFrom(getFrom());
 		o.setName(getName());

@@ -11,7 +11,7 @@ public class ConferenceCollection extends Conference {
 
 	public ConferenceCollection(final Conference c) {
 
-		setCity(c.getCity());
+		setLocation(c.getLocation());
 		setDescription(c.getDescription());
 		setFrom(c.getFrom());
 		setId(c.getId());

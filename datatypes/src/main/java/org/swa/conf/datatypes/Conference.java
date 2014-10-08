@@ -14,7 +14,7 @@ public class Conference extends AbstractDatatype {
 	private String description;
 	private Date from;
 	private Date to;
-	private Location city;
+	private Location location;
 	private List<? extends Talk> talks;
 
 	/** Cross-property validation - check the visibility !!! */
@@ -41,8 +41,8 @@ public class Conference extends AbstractDatatype {
 	}
 
 	@Valid
-	public Location getCity() {
-		return city;
+	public Location getLocation() {
+		return location;
 	}
 
 	public List<? extends Talk> getTalks() {
@@ -69,8 +69,8 @@ public class Conference extends AbstractDatatype {
 		return this;
 	}
 
-	public Conference setCity(final Location city) {
-		this.city = city;
+	public Conference setLocation(final Location location) {
+		this.location = location;
 		return this;
 	}
 
@@ -83,7 +83,7 @@ public class Conference extends AbstractDatatype {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((city == null) ? 0 : city.hashCode());
+		result = prime * result + ((location == null) ? 0 : location.hashCode());
 		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		result = prime * result + ((from == null) ? 0 : from.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
@@ -102,10 +102,10 @@ public class Conference extends AbstractDatatype {
 		if (!(obj instanceof Conference))
 			return false;
 		final Conference other = (Conference) obj;
-		if (city == null) {
-			if (other.city != null)
+		if (location == null) {
+			if (other.location != null)
 				return false;
-		} else if (!city.equals(other.city))
+		} else if (!location.equals(other.location))
 			return false;
 		if (description == null) {
 			if (other.description != null)
@@ -148,8 +148,8 @@ public class Conference extends AbstractDatatype {
 		builder.append(from);
 		builder.append(", to=");
 		builder.append(to);
-		builder.append(", city=");
-		builder.append(city);
+		builder.append(", location=");
+		builder.append(location);
 		builder.append(", talks=");
 		builder.append(talks);
 		builder.append("]");

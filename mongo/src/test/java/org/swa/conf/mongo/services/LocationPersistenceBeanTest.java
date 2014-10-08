@@ -54,10 +54,10 @@ public class LocationPersistenceBeanTest {
 
 		final LocationCollection l = new LocationCollection();
 		l.setId(null);
-		l.setCity("Sin");
+		l.setName("Sin");
 		l.setLatitude(66.66);
 		l.setLongitude(6.6);
-		l.setStreet("Abc Str");
+		l.setAddress("Abc Str");
 		l.setRooms(rooms);
 
 		for (final AbstractDatatype r : l.getRooms())
