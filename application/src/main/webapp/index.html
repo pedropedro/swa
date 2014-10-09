@@ -26,16 +26,15 @@
 	<button ng-click="getAllConferences()">Refresh</button>
 
 	<label>Rows per page:</label>
-	<a enabled="{{rowsPerPage!==5}}" ng-click="rowsPerPage=5">5</a>
-	<a enabled="{{rowsPerPage!==10}}" ng-click="rowsPerPage=10">10</a>
-	<a enabled="{{rowsPerPage!==20}}" ng-click="rowsPerPage=20">20</a>
-	<a  ng-click="rowsPerPage=50">50</a>
+	<input id="rpp" type="text" size="2" pattern="\d{1,2}" ng-model="table.rowsPerPage" />
+	<a href="" ng-click="table.rowsPerPage=5">5</a> <a href="" ng-click="table.rowsPerPage=10">10</a>
+	<a href="" ng-click="table.rowsPerPage=20">20</a> <a href="" ng-click="table.rowsPerPage=50">50</a>
 
-	<div ui-grid="table" class="ui-grid" ui-grid-resize-columns></div>
+	<div style="margin:0 auto; text-align:center; width:99%;" ui-grid="table" class="ui-grid" ui-grid-resize-columns></div>
 
-	<label>Rows per page: {{rowsPerPage}}</label>
-	<label>Query: {{queryParam}}</label>
-	<label>Sort: {{sortParam}}</label>
+	<label>Rows per page: {{table.rowsPerPage | number }}</label>
+	<label>Query: {{table.queryParam}}</label>
+	<label>Sort: {{table.sortParam}}</label>
 
 	<div>
 		<table class="table table-striped">
