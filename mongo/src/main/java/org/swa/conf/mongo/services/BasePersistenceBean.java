@@ -13,7 +13,6 @@ import org.jongo.MongoCollection;
 import org.slf4j.Logger;
 import org.swa.conf.business.persistence.BasePersistenceService;
 import org.swa.conf.datatypes.AbstractDatatype;
-import org.swa.conf.mongo.annotations.DocumentAttributes;
 import org.swa.conf.monitoring.StatisticsSource;
 
 @StatisticsSource
@@ -37,7 +36,7 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 	// Möglicher ansatz: dynamischer WriteConcern - Exception abfangen (nicht so viele Server vorhanden wie gewollt)
 	// und versuchen eine Stufe runter
 
-	protected WriteConcern defaultWriteConcern;
+	protected WriteConcern defaultWriteConcern = NONE;
 
 	private Class<T> genericClass;
 
@@ -106,13 +105,12 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 
 	protected List<T> find(final String nativeQuery, final Integer skip, final Integer limit, final String sortBy) {
 
-		log.debug("Finding {}s using query {}", genericClass.getSimpleName(), nativeQuery);
-
 		final List<T> l = new ArrayList<>();
 
 		Find find = getCollection().find(nativeQuery);
 		if (skip != null) find = find.skip(skip < 0 ? 0 : skip); // mongoDB dislikes negative skips
 		if (limit != null) find = find.limit(limit); // negative == positive, 0 == no limit
+		String sortJson = null;
 		if (sortBy != null) {
 
 			int ptr = 0;
@@ -135,8 +133,12 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 				sb.append(sortBy.charAt(ptr++)).append("1"); // -1 for descending
 			}
 			sb.append("}");
-			find = find.sort(sb.toString());
+			sortJson = sb.toString();
+			find = find.sort(sortJson);
 		}
+
+		log.debug("Finding {}s using query {}; sort {}; skip {}; limit {}", genericClass.getSimpleName(), nativeQuery,
+				sortJson, skip == null ? null : skip < 0 ? 0 : skip, limit);
 
 		for (final T t : find.as(genericClass))
 			l.add(t);
@@ -169,7 +171,7 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 	protected void setGenericClass(final Class<?> genericClass) {
 
 		this.genericClass = (Class<T>) genericClass;
-
+/*
 		final DocumentAttributes d = genericClass.getAnnotation(DocumentAttributes.class);
 		if (d != null)
 			switch (d.criticality()) {
@@ -187,6 +189,7 @@ public abstract class BasePersistenceBean<T extends AbstractDatatype> implements
 			}
 		else
 			defaultWriteConcern = NONE;
+*/
 	}
 
 	private Long getId() {

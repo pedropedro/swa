@@ -43,6 +43,17 @@ public class Utils {
 		}
 	}
 
+
+	/** yyyy-MM-dd */
+	public static String formatDate(final Date date) {
+		return df.format(date);
+	}
+
+	/** yyyy-MM-dd HH:mm */
+	public static String formatDateTime(final Date dateTime) {
+		return dtf.format(dateTime);
+	}
+
 	@Test
 	public void test() {
 		System.out.println(parseDate("2000-06-01"));

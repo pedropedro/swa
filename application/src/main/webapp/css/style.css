@@ -1,20 +1,22 @@
-body {
-	margin-left: auto;
-	margin-right: auto;
-	text-align: center;
+@-webkit-keyframes spin {
+  to {
+    stroke-dashoffset: -264;
+  }
 }
 
-.table-striped tbody > tr:nth-child(odd) > td,
-.table-striped tbody > tr:nth-child(odd) > th {
-	background-color: #f9f9f9;
+@keyframes spin {
+  to {
+    stroke-dashoffset: -264;
+  }
 }
 
-h3 {
-	margin: 0 0 20px;
-	text-align: center;
-}
-
-.grid {
-	width:  500px;
-	height: 250px;
+.spinner circle {
+  fill: none;
+  stroke: slategray;
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-dasharray: 0, 0, 70, 194;
+  stroke-dashoffset: 0;
+  animation: spin 1s infinite linear;
+  -webkit-animation: spin 1s infinite linear;
 }
