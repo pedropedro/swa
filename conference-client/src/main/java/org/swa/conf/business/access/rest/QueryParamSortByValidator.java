@@ -11,7 +11,7 @@ import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 
 @Constraint(validatedBy = {})
-@Pattern(regexp = "([0-9a-zA-Z_]+[-+])*")
+@Pattern(regexp = "([a-zA-Z]+[0-9a-zA-Z_\\.]*[-+])*")
 @ReportAsSingleViolation
 @Documented
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.PARAMETER})

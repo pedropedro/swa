@@ -10,39 +10,39 @@
 	<script type="text/javascript" src="lib/angularjs/angular-animate.min.js"></script>
 	<script type="text/javascript" src="lib/angularjs/angular-resource.min.js"></script>
 	<script type="text/javascript" src="lib/angularjs/angular-route.min.js"></script>
-	<script type="text/javascript" src="lib/ui-grid/ui-grid.min.js"></script>
+	<script type="text/javascript" src="lib/ui-grid/ui-grid.js"></script>
 	<script type="text/javascript" src="lib/date-format.js"></script>
 
 	<script type="text/javascript" src="script/conference.js"></script>
 
-	<link type="text/css" rel="styleSheet" href="lib/ui-grid/ui-grid.min.css" />
+	<link type="text/css" rel="styleSheet" href="lib/ui-grid/ui-grid.css" />
 
 	<link type="text/css" rel="stylesheet" href="css/style.css" />
 </head>
 
-<body ng-controller="ConferenceCtrl">
+<body ng-controller="ConferenceCtrl" ng-element-ready="getTable().query()">
 
 <h3 style="text-align: center;">Conferences</h3>
 
-<button title="First page" ng-click="" ng-disabled="queryRunning">&lt&lt</button>
-<button title="Previous page" ng-click="" ng-disabled="queryRunning">&lt</button>
-<input  title="Current page" style="width: 5ex;" type="number" ng-model="table.pageParam" min="1" max="99" required ng-disabled="queryRunning" />
-<button title="Next page" ng-click="" ng-disabled="queryRunning">&gt</button>
-<button title="Last page" ng-click="" ng-disabled="queryRunning">&gt&gt</button>
+<button title="First page" ng-click="" ng-disabled="table.isQueryRunning()">&lt&lt</button>
+<button title="Previous page" ng-click="" ng-disabled="table.isQueryRunning()">&lt</button>
+<input  title="Current page" style="width: 5ex;" type="number" ng-model="table.pageParam" min="1" max="99" required ng-disabled="table.isQueryRunning()" />
+<button title="Next page" ng-click="" ng-disabled="table.isQueryRunning()">&gt</button>
+<button title="Last page" ng-click="" ng-disabled="table.isQueryRunning()">&gt&gt</button>
 <input  title="Rows found" style="width: 3ex;" disabled ng-model="table.data.length"/>
 <label> RPP:</label>
-<input  title="Rows per page" style="width: 5ex;" type="number" ng-model="table.rowsPerPage" min="1" max="99" required ng-disabled="queryRunning" />
+<input  title="Rows per page" style="width: 5ex;" type="number" ng-model="table.rowsPerPage" min="1" max="99" required ng-disabled="table.isQueryRunning()" />
 <a href="" ng-click="table.rowsPerPage=5">5</a> <a href="" ng-click="table.rowsPerPage=10">10</a>
 <a href="" ng-click="table.rowsPerPage=20">20</a> <a href="" ng-click="table.rowsPerPage=50">50</a>
 
 <br>
-<button ng-click="query()" ng-disabled="queryRunning">Search</button>
+<button ng-click="table.query()" ng-disabled="table.isQueryRunning()">Search</button>
 <svg class="spinner" viewBox="0 0 100 100" width="2ex" height="2ex">
 	<circle cx="50" cy="50" r="40" />
 </svg>
 <label>Sort: {{table.getSortParam()}}</label> <label>Filter: {{table.getQueryParam()}} </label>
 
-<div ui-grid="table" class="ui-grid" ui-grid-resize-columns></div>
+<div ui-grid="getTable()" class="ui-grid" ui-grid-resize-columns></div>
 
 <!--
 	<div>
