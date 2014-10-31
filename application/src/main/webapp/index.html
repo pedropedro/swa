@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- Declares the root element that allows behavior to be modified through Angular custom HTML tags. -->
 <html ng-app="ConferenceApp">
 <head>
 	<meta charset="UTF-8">
@@ -10,13 +9,16 @@
 	<script type="text/javascript" src="lib/angularjs/angular-animate.min.js"></script>
 	<script type="text/javascript" src="lib/angularjs/angular-resource.min.js"></script>
 	<script type="text/javascript" src="lib/angularjs/angular-route.min.js"></script>
-	<script type="text/javascript" src="lib/ui-grid/ui-grid.js"></script>
+
+	<script type="text/javascript" src="lib/angular-ui/ui-bootstrap.js"></script>
+	<script type="text/javascript" src="lib/angular-ui/ui-grid.js"></script>
+	<script type="text/javascript" src="lib/angular-ui/ui-router.js"></script>
+	<link type="text/css" rel="styleSheet" href="lib/angular-ui/ui-grid.css" />
+	<link type="text/css" rel="styleSheet" href="lib/angular-ui/bootstrap.css" />
+
 	<script type="text/javascript" src="lib/date-format.js"></script>
-
+	<script type="text/javascript" src="lib/ui-directives.js"></script>
 	<script type="text/javascript" src="script/conference.js"></script>
-
-	<link type="text/css" rel="styleSheet" href="lib/ui-grid/ui-grid.css" />
-
 	<link type="text/css" rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -36,7 +38,7 @@
 <a href="" ng-click="table.rowsPerPage=20">20</a> <a href="" ng-click="table.rowsPerPage=50">50</a>
 
 <br>
-<button ng-click="table.query()" ng-disabled="table.isQueryRunning()">Search</button>
+<button ng-click="table.query()" ng-disabled="table.isQueryRunning()" focus>Search</button>
 <svg class="spinner" viewBox="0 0 100 100" width="2ex" height="2ex">
 	<circle cx="50" cy="50" r="40" />
 </svg>

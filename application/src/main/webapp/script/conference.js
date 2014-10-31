@@ -1,18 +1,9 @@
 "use strict";
 
-var ConferenceApp = angular.module('ConferenceApp', ['ngResource','ngAnimate','ngRoute','ui.grid','ui.grid.resizeColumns']);
-
-ConferenceApp.directive('ngElementReady', [function() {
-	return {
-		priority:	-1000, // a low number so this directive loads after all other directives have loaded.
-		restrict:	"A", // attribute only
-		link:		function($scope, $element, $attributes)
-					{
-						console.log(" -- Element ready! ", $attributes.ngElementReady );
-						$scope.$eval($attributes.ngElementReady);
-					}
-	};
-}]);
+var ConferenceApp = angular.module('ConferenceApp', [
+'ngResource','ngAnimate','ngRoute',
+'ui.grid','ui.grid.resizeColumns',
+'ui.directives']);
 
 ConferenceApp.config( function($provide){ $provide.decorator('GridOptions', function($delegate){ return function(){
 
@@ -221,6 +212,15 @@ function( $scope, uiGridConstants, rsql, ConferenceREST ) {
 			{ name:'location.name', width:'12%', displayName: 'Location', filter:
 					{ condition: uiGridConstants.filter.STARTS_WITH, placeholder: '* is a wildcard'} }
 		];
+
+	var d = function(){
+		var a = ['A','B'];
+		return function(n){ return a[n]; };
+	}();
+
+	var x = d(1);
+
+	console.log(x);
 
 //	$scope.getTable().query();
 
