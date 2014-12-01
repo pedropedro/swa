@@ -79,7 +79,7 @@ ConferenceApp.factory('rsql', ['uiGridConstants', function(uiGridConstants) {
 						where += "' and ";
 					}
 
-			if( where.endsWith("' and ") ) where = where.substring(0, where.length - 5);
+			if( where.length ) where = where.substring(0, where.length - 5);
 
 			return where;
 		},
@@ -119,11 +119,24 @@ ConferenceApp.factory('rsql', ['uiGridConstants', function(uiGridConstants) {
 	};
 }]);
 
+// TEST
+ConferenceApp.constant('myDiConst', 'C');
+ConferenceApp.value('myDiValue', 21);
+ConferenceApp.factory('myDiFactory', ['myDiConst', function(c){ return { f1:function(){return c}, f2:function(n){return n*n} } }]);
+ConferenceApp.service('myDiService', ['myDiValue', function(v){ this.a=v; this.f3 = function(b){return b+this.a}; } ]);
+ConferenceApp.service('myService', ['myDiFactory','myDiService', function(f,s){
+	this.factory = f;
+	this.service = s;
+	this.f4 = function(b){return this.factory.f1() + this.service.f3(b)};
+	this.f5 = function(n){return this.factory.f2(n)};
+}]);
+
 // Create a default table in given scope
-function createDefaultTable( $scope, rsql, rest, spinner ){
+function createDefaultTable( $scope, rsql, rest ){
 
 	$scope.table = {};
 	$scope.table.data = {};
+	$scope.table.errors = [];
 	$scope.table.rowsPerPage = 5;
 	$scope.table.getRowsParam = function(){ return $scope.table.rowsPerPage ? $scope.table.rowsPerPage : 5 };
 	$scope.table.pageParam = 1;
@@ -152,21 +165,21 @@ function createDefaultTable( $scope, rsql, rest, spinner ){
 	$scope.table.queryRunning = false;
 	$scope.table.isQueryRunning = function(){ return $scope.table.queryRunning };
 	$scope.table.query = function(){
-		$scope.table.queryRunning = true;
-		if(spinner) spinner.style.visibility = 'visible';
-		if(rest) rest.query({	id:null, p:$scope.table.getPageParam(), r:$scope.table.getRowsParam(),
-								s:$scope.table.getSortParam(), q:$scope.table.getQueryParam()}
-							).$promise.then(
-								function(data){
-									$scope.table.data = data;
-									if(spinner) spinner.style.visibility = 'hidden';
-									$scope.table.queryRunning = false;
-								},
-								function( error ){
-									alert(getErrorAsString(error));
-									if(spinner) spinner.style.visibility = 'hidden';
-									$scope.table.queryRunning = false;
-								});
+		if(rest) {
+			$scope.table.queryRunning = true;
+
+			rest.query({id:null, p:$scope.table.getPageParam(), r:$scope.table.getRowsParam(),
+						s:$scope.table.getSortParam(), q:$scope.table.getQueryParam()}
+						).$promise.then(
+							function(data){
+								$scope.table.data = data;
+								$scope.table.queryRunning = false;
+							},
+							function( error ){
+								$scope.table.errors.push(getErrorAsString(error));
+								$scope.table.queryRunning = false;
+							});
+		}
     };
 
 	$scope.getTable = function() { return $scope.table };
@@ -193,10 +206,10 @@ function getErrorAsString( error ){
 // Conferences UI ------------------------------------------------------------------------------------------------------
 ConferenceApp.factory('ConferenceREST', ['$resource', function(r){ return r('rest/conferences/:id'); }]);
 
-ConferenceApp.controller("ConferenceCtrl", ['$scope','uiGridConstants','rsql','ConferenceREST',
-function( $scope, uiGridConstants, rsql, ConferenceREST ) {
+ConferenceApp.controller("ConferenceCtrl", ['$scope','uiGridConstants','rsql','ConferenceREST','$log',
+function( $scope, uiGridConstants, rsql, ConferenceREST, $log ) {
 
-	createDefaultTable( $scope, rsql, ConferenceREST, document.querySelector('.spinner') );
+	createDefaultTable( $scope, rsql, ConferenceREST );
 
 	$scope.getTable().columnDefs = [
 			{ name:'name', width:'25%', enableSorting: false, filter:
@@ -213,14 +226,9 @@ function( $scope, uiGridConstants, rsql, ConferenceREST ) {
 					{ condition: uiGridConstants.filter.STARTS_WITH, placeholder: '* is a wildcard'} }
 		];
 
-	var d = function(){
-		var a = ['A','B'];
-		return function(n){ return a[n]; };
-	}();
+	$scope.$log = $log;
 
-	var x = d(1);
-
-	console.log(x);
+	$log.info('INFO logged');
 
 //	$scope.getTable().query();
 
