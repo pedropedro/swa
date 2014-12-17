@@ -1,36 +1,44 @@
+/* Demo AngularJS app for JUnit tests */
 "use strict";
 
-var ConferenceApp = angular.module('ConferenceApp', [
+// Declare a new module with dependencies to be injected
+var myApp = angular.module('myApp', [
 'ngResource','ngAnimate','ngRoute',
-'ui.grid','ui.grid.resizeColumns',
-'ui.directives']);
+'ui.grid','ui.grid.resizeColumns']);
 
-ConferenceApp.config( function($provide){ $provide.decorator('GridOptions', function($delegate){ return function(){
+// Define different flavours of Angular injectable services
+myApp.constant('myDiConst', 'C');
 
-	var defaultTable = new $delegate();
+myApp.value('myDiValue', 21);
 
-	defaultTable.getRowIdentity   = function(row) { return row.id; };
-	defaultTable.enableRowHashing = false;
+myApp.factory('myDiFactory', ['myDiConst', function(c){
+	return {
+		f1:function(){return c},
+		f2:function(n){return n*n}
+	}
+}]);
 
-	defaultTable.enableScrollbars     = false;
-	defaultTable.enableSorting        = true;
-	defaultTable.useExternalSorting   = true;
-	defaultTable.enableFiltering      = true;
-	defaultTable.useExternalFiltering = true;
-	defaultTable.minRowsToShow        = 1;
-	defaultTable.virtualizationThreshold = 99;
+myApp.service('myDiService', ['myDiValue', function(v){
+	this.a = v;
+	this.f3 = function(b){return b+this.a};
+}]);
 
-	return defaultTable;
-};})});
+myApp.service('myService', ['myDiFactory','myDiService', function(f,s){
+	this.factory = f;
+	this.service = s;
+	this.f4 = function(b){return this.factory.f1() + this.service.f3(b)};
+	this.f5 = function(n){return this.factory.f2(n)};
+}]);
 
 /* R-SQL service
  * getWhere() - build a R-SQL conform filter / "where" string using current visible values in the grid filter
  * getOrderBy - build a R-SQL conform sort / "order by" string using current visible values in the grid column sorter
  */
-ConferenceApp.factory('rsql', ['uiGridConstants', function(uiGridConstants) {
+myApp.factory('rsql', ['uiGridConstants', function(uiGridConstants) {
 	return {
 		getWhere : // Build a R-SQL "where" filter string
 		function (aGrid) {
+			// a grid from ui.grid module
 
 			var where = '';
 
@@ -119,6 +127,65 @@ ConferenceApp.factory('rsql', ['uiGridConstants', function(uiGridConstants) {
 	};
 }]);
 
+// interacting with browser window object
+myApp.factory('myAlert', ['$window', function(win){
+	return function(msg){
+		win.alert(msg);
+		return "42";
+	}
+}]);
+
+// simple directive
+myApp.directive('sDir', function() {
+	return {
+		restrict: 'E',
+		replace: true,
+		template: '<p>ABC{{0 + 1}}</p>'
+	};
+});
+
+// filter
+myApp.filter('reverse', function() {
+	return function(input, uppercase) {
+		input = input || '';
+		var out = '';
+		for (var i = 0; i < input.length; i++) {
+			out = input.charAt(i) + out;
+		}
+		// conditional based on optional argument
+		if (uppercase) {
+			out = out.toUpperCase();
+		}
+		return out;
+	};
+});
+
+
+
+//                         TODO : REST bez ui-grid
+
+
+
+myApp.config( function($provide){ $provide.decorator('GridOptions', function($delegate){ return function(){
+
+	var defaultTable = new $delegate();
+
+	defaultTable.getRowIdentity   = function(row) { return row.id; };
+	defaultTable.enableRowHashing = false;
+
+	defaultTable.enableScrollbars     = false;
+	defaultTable.enableSorting        = true;
+	defaultTable.useExternalSorting   = true;
+	defaultTable.enableFiltering      = true;
+	defaultTable.useExternalFiltering = true;
+	defaultTable.minRowsToShow        = 1;
+	defaultTable.virtualizationThreshold = 99;
+
+	return defaultTable;
+};})});
+
+
+
 // Create a default table in given scope
 function createDefaultTable( $scope, rsql, rest ){
 
@@ -192,10 +259,10 @@ function getErrorAsString( error ){
 };
 
 // Conferences UI ------------------------------------------------------------------------------------------------------
-ConferenceApp.factory('ConferenceREST', ['$resource', function(r){ return r('rest/conferences/:id'); }]);
+myApp.factory('REST', ['$resource', function(r){ return r('rest/conferences/:id'); }]);
 
-ConferenceApp.controller("ConferenceCtrl", ['$scope','uiGridConstants','rsql','ConferenceREST','$log',
-function( $scope, uiGridConstants, rsql, ConferenceREST, $log ) {
+myApp.controller("MainCtrl", ['$scope','uiGridConstants','rsql','REST','$log',
+	function( $scope, uiGridConstants, rsql, ConferenceREST, $log ) {
 
 	createDefaultTable( $scope, rsql, ConferenceREST );
 
@@ -216,24 +283,25 @@ function( $scope, uiGridConstants, rsql, ConferenceREST, $log ) {
 
 	$scope.$log = $log;
 
-//	$scope.getTable().query();
+	$log.info('INFO logged');
 
+	$scope.count = 0;
+	$scope.$on('MyEvent', function() { $scope.count++; });
+}]);
+
+// scope inheritance
+myApp.controller("ChildCtrl", ['$scope', function(childScope){
 /*
-	$scope.remove = function(id){
-		ConferenceREST.remove({id:id});
-	};
-
-	$scope.save = function(){
-		ConferenceREST.save($scope.data.currentConference);
-		$scope.data.currentConference = {};
-	};
-
-	$scope.edit = function(id){
-		ConferenceREST.get({id:id}, function(data) {
-			$scope.data.currentConference = data;
-			$scope.data.currentConference.from = new Date($scope.data.currentConference.from).format("YYYY-MM-DD");
-			$scope.data.currentConference.to = new Date($scope.data.currentConference.to).format("YYYY-MM-DD");;
-		});
-	}
+beforeEach(inject(function($rootScope, $controller) {
+    mainScope = $rootScope.$new();
+    $controller('MainController', {$scope: mainScope});
+    childScope = mainScope.$new();
+    $controller('ChildController', {$scope: childScope});
+    grandChildScope = childScope.$new();
+    $controller('GrandChildController', {$scope: grandChildScope});
+}));
 */
 }]);
+
+// decorator
+

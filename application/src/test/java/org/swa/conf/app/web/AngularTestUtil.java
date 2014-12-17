@@ -17,6 +17,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import jdk.nashorn.api.scripting.AbstractJSObject;
+import jdk.nashorn.api.scripting.JSObject;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.junit.After;
 import org.junit.Before;
@@ -116,7 +117,7 @@ class AngularTestUtil {
 		return call(E.get("$W"), "addProperty", propertyName, propertyObj, destination);
 	}
 
-	/** Convert javax.json.JsonStructure to ScriptObjectMirror */
+	/** Convert javax.json.JsonStructure to native JSON structure (wrapped as ScriptObjectMirror) */
 	Object json(final JsonStructure json) {
 		return call(E.get("$W"), "json2js", json.toString());
 	}
@@ -146,7 +147,12 @@ class AngularTestUtil {
 		return $inj("$controller").call(null, name, dependencies);
 	}
 
-	/** Add function mocks to an Angular object (service, factory, constant, provider, ...)*/
+	/** Execute a filter */
+	Object execFilter(final String name, final Object... dependencies) {
+		return ((JSObject) $inj("$filter").call(null, name)).call(null, dependencies);
+	}
+
+	/** Add function mocks to an Angular object (service, factory, constant, provider, ...) */
 	void mock(final String mockName, final Map<String, Function<Object[], Object>> functions) {
 
 		E.put("_$Mock", new AbstractJSObject() {
