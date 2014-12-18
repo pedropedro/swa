@@ -4,9 +4,9 @@ import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
@@ -19,8 +19,6 @@ import javax.script.ScriptEngineManager;
 import jdk.nashorn.api.scripting.AbstractJSObject;
 import jdk.nashorn.api.scripting.JSObject;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
-import org.junit.After;
-import org.junit.Before;
 
 class AngularTestUtil {
 
@@ -28,21 +26,9 @@ class AngularTestUtil {
 	static final Invocable I = (Invocable) E;
 	static final JsonObject EMPTY_JSON = Json.createObjectBuilder().build();
 	static String APP_MODULE;
-	static UnaryOperator<String> TEST_MODULE = s -> s + "$Test$";
+	static final String TEST_SUFFIX = "$Test$";
 	// MAVEN's <project>/webapp folder
 	static String WebAppDir;
-
-	@Before
-	public void commonSetupBeforeEach() {
-		// runs before @Before in the test
-		// call(E.get("$W"), "beforeEachFnc");
-	}
-
-	@After
-	public void commonTearDownAfterEach() {
-		// runs after @After in the test
-		// call(E.get("$W"), "afterEachFnc");
-	}
 
 	/** Load AngularJS and the App to be tested, may be from a @BeforeClass method */
 	static void loadInvariants(final String appName, final String... scripts) throws Exception {
@@ -54,8 +40,15 @@ class AngularTestUtil {
 		// MAVEN puts compiled test classes under <project>/target/.... directory
 		WebAppDir = THIS.getResource("").getPath().split("target")[0] + "src/main/webapp/";
 
-		// first, load browser object mocks and store them
-		E.put("$W", exec(new String(Files.readAllBytes(Paths.get(THIS.getResource("/angular-headless.js").toURI())))));
+		// first, load browser object mocks
+		exec("   var window = { length : 0, location : {}, name : 'NG_ENABLE_DEBUG_INFO!' };" +
+				"var document = { " +
+				"  addEventListener       : function(){}," +
+				"  createDocumentFragment : function(){ return{ appendChild:function(){ return { childNodes:[] };}," +
+				"                                               firstChild :{textContent:''} }; }," +
+				"  createElement          : function(){ return{ pathname:'', setAttribute:function(){} }; }," +
+				"  querySelector          : function(){}" +
+				"};");
 
 		// then load AngularJS from local storage (no dependency to (inter)net for our JUnit tests ...)
 		E.eval(new FileReader(WebAppDir + "lib/angularjs/angular.js"));
@@ -75,13 +68,13 @@ class AngularTestUtil {
 		// load all script dependencies
 		for (final String s : scripts) E.eval(new FileReader(WebAppDir + s));
 		// let depend the tested App on ngMock (using a new dummy module)
-		exec("angular.module('" + TEST_MODULE.apply(APP_MODULE) + "', ['ngMock','" + APP_MODULE + "']);");
+		exec("angular.module('" + APP_MODULE + TEST_SUFFIX + "', ['ngMock','" + APP_MODULE + "']);");
 	}
 
 	/** Bootstrap the App */
 	void boot() {
-		// boot the App-Wrapper and store the main $injector
-		E.put("$INJ", exec("angular.bootstrap(document, ['" + TEST_MODULE.apply(APP_MODULE) + "']);"));
+		// boot the App-Wrapper and store the main findector
+		E.put("$INJ", exec("angular.bootstrap(document, ['" + APP_MODULE + TEST_SUFFIX + "']);"));
 	}
 
 	/** Execute JavaScript */
@@ -102,29 +95,28 @@ class AngularTestUtil {
 		}
 	}
 
-	/** Get an injectable AngularJS object */
-	ScriptObjectMirror $inj(final Object... params) {
+	/** Find an AngularJS component - service, factory, filter, controller, ... */
+	ScriptObjectMirror find(final Object... params) {
 		return (ScriptObjectMirror) call(E.get("$INJ"), "get", params);
 	}
 
 	/** Create new JS-Object with given Property */
-	Object create(final String propertyName, final Object propertyObj) {
+	Object newJson(final String propertyName, final Object propertyObj) {
 		return extend(propertyName, propertyObj, null);
 	}
 
 	/** Extend existing JS-Object with given Property */
 	Object extend(final String propertyName, final Object propertyObj, final Object destination) {
-		return call(E.get("$W"), "addProperty", propertyName, propertyObj, destination);
-	}
-
-	/** Convert javax.json.JsonStructure to native JSON structure (wrapped as ScriptObjectMirror) */
-	Object json(final JsonStructure json) {
-		return call(E.get("$W"), "json2js", json.toString());
+		E.put("_$$$key", propertyName);
+		E.put("_$$$val", propertyObj);
+		E.put("_$$$dst", destination);
+		exec("_$$$dst=_$$$dst||{}; _$$$dst[_$$$key]=_$$$val;");
+		return E.get("_$$$dst");
 	}
 
 	/** Retrieve $rootScope's property value located at "p1.p2.m1().p4.0.#!Z()" for example. */
 	Object inspectScope(final String propertyChain) {
-		Object rs = $inj("$rootScope");
+		Object rs = find("$rootScope");
 		for (final String s : Arrays.asList(propertyChain.split("\\."))) {
 			if (rs == null) break;
 			if (s.endsWith("()")) rs = ((ScriptObjectMirror) rs).callMember(s.substring(0, s.length() - 2));
@@ -135,21 +127,36 @@ class AngularTestUtil {
 
 	/** JS-Object with mocked $scope (from ngMock) */
 	Object getScopeMock() {
-		return create("$scope", $inj("$rootScope"));
+		return newJson("$scope", find("$rootScope"));
 	}
 
 	HttpMock getMockHttp() {
-		return I.getInterface($inj("$httpBackend"), HttpMock.class);
+		return I.getInterface(find("$httpBackend"), HttpMock.class);
 	}
 
 	/** Execute a controller */
 	Object execController(final String name, final Object dependencies) {
-		return $inj("$controller").call(null, name, dependencies);
+		return find("$controller").call(null, name, dependencies);
 	}
 
 	/** Execute a filter */
 	Object execFilter(final String name, final Object... dependencies) {
-		return ((JSObject) $inj("$filter").call(null, name)).call(null, dependencies);
+		return ((JSObject) find("$filter").call(null, name)).call(null, dependencies);
+	}
+
+	/* Execute a nameless function */
+	Object exec(final Object function, final Object... params) {
+		return ((JSObject) function).call(null, params);
+	}
+
+	/* Evaluate an AngularJS {{expression}} using given parameters */
+	Object evalExpression(final String expression, final Object paramsAsJson) {
+		return ((JSObject) find("$interpolate").call(null, expression)).call(null, paramsAsJson);
+	}
+
+	/* Find a directive */
+	ScriptObjectMirror findDirective(final String directiveName) {
+		return (ScriptObjectMirror) find(directiveName + "Directive").get("0");
 	}
 
 	/** Add function mocks to an Angular object (service, factory, constant, provider, ...) */
@@ -170,18 +177,27 @@ class AngularTestUtil {
 				};
 			}
 		});
-		exec("angular.module('" + TEST_MODULE.apply(APP_MODULE) + "').constant('" + mockName + "',_$Mock);");
+		exec("angular.module('" + APP_MODULE + TEST_SUFFIX + "').constant('" + mockName + "',_$Mock);");
 	}
 
-
 	/** Get json object builder and save 20 characters on the screen ;-) */
-	JsonObjectBuilder json() {
+	JsonObjectBuilder jObj() {
 		return Json.createObjectBuilder();
 	}
 
 	/** Get json array builder and save 19 characters on the screen ;-) */
 	JsonArrayBuilder jArr() {
 		return Json.createArrayBuilder();
+	}
+
+	/** Convert javax.json.JsonStructure to native JavaScript object */
+	Object toJS(final JsonStructure jsonStructure) {
+		return exec("angular.fromJson('" + jsonStructure + "');");
+	}
+
+	/* Convert Javascript array to Java List<?> */
+	List<?> asList(final Object jsArray) {
+		return ((ScriptObjectMirror) jsArray).to(List.class);
 	}
 
 	public interface HttpMock {

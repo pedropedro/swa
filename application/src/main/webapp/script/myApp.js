@@ -2,9 +2,7 @@
 "use strict";
 
 // Declare a new module with dependencies to be injected
-var myApp = angular.module('myApp', [
-'ngResource','ngAnimate','ngRoute',
-'ui.grid','ui.grid.resizeColumns']);
+var myApp = angular.module('myApp', ['ngResource','ngAnimate','ngRoute','ui.grid','ui.grid.resizeColumns']);
 
 // Define different flavours of Angular injectable services
 myApp.constant('myDiConst', 'C');
@@ -135,12 +133,20 @@ myApp.factory('myAlert', ['$window', function(win){
 	}
 }]);
 
-// simple directive
-myApp.directive('sDir', function() {
+// directive with template
+myApp.directive('templateDir', function() {
 	return {
 		restrict: 'E',
 		replace: true,
-		template: '<p>ABC{{0 + 1}}</p>'
+		template: '<p>ABC{{x + y}}</p>'
+	};
+});
+
+// directive with link function
+myApp.directive('linkDir', function() {
+	return {
+		restrict: 'A',
+		link: function(s,e,a) { s.zzz = e.element + a.attribute; }
 	};
 });
 
@@ -161,132 +167,38 @@ myApp.filter('reverse', function() {
 });
 
 
+// controller
+myApp.controller("MainCtrl", ['$scope','$resource','$log', function( $scope, $resource, $log ) {
 
-//                         TODO : REST bez ui-grid
-
-
-
-myApp.config( function($provide){ $provide.decorator('GridOptions', function($delegate){ return function(){
-
-	var defaultTable = new $delegate();
-
-	defaultTable.getRowIdentity   = function(row) { return row.id; };
-	defaultTable.enableRowHashing = false;
-
-	defaultTable.enableScrollbars     = false;
-	defaultTable.enableSorting        = true;
-	defaultTable.useExternalSorting   = true;
-	defaultTable.enableFiltering      = true;
-	defaultTable.useExternalFiltering = true;
-	defaultTable.minRowsToShow        = 1;
-	defaultTable.virtualizationThreshold = 99;
-
-	return defaultTable;
-};})});
-
-
-
-// Create a default table in given scope
-function createDefaultTable( $scope, rsql, rest ){
+	var rest = $resource('rest/conferences/:id');
 
 	$scope.table = {};
 	$scope.table.data = {};
 	$scope.table.errors = [];
-	$scope.table.rowsPerPage = 5;
-	$scope.table.getRowsParam = function(){ return $scope.table.rowsPerPage ? $scope.table.rowsPerPage : 5 };
-	$scope.table.pageParam = 1;
-	$scope.table.getPageParam = function(){ return $scope.table.pageParam ? $scope.table.pageParam : 1 };
-	$scope.table.queryParam = '';
-	$scope.table.getQueryParam = function(){ return $scope.table.queryParam === '' ? null : $scope.table.queryParam };
-	$scope.table.sortParam = {};
-	$scope.table.getSortParam = function(){
-		var s = '';
-		for(var key in $scope.table.sortParam) s += ( key + $scope.table.sortParam[key] );
-		return s === '' ? null : s;
-	};
 
-	$scope.table.onRegisterApi = function( gridApi ){
-		if(rsql) {
-			gridApi.core.on.sortChanged( $scope, function( grid, sortColumns ){
-				$scope.table.sortParam = rsql.getOrderBy( sortColumns, $scope.table.sortParam );
-			});
-
-			gridApi.core.on.filterChanged( $scope, function() {
-				$scope.table.queryParam = rsql.getWhere( this.grid );
-			});
-		};
-	};
-
-	$scope.table.queryRunning = false;
-	$scope.table.isQueryRunning = function(){ return $scope.table.queryRunning };
 	$scope.table.query = function(){
 		if(rest) {
 			$scope.table.queryRunning = true;
 
-			rest.query({id:null, p:$scope.table.getPageParam(), r:$scope.table.getRowsParam(),
-						s:$scope.table.getSortParam(), q:$scope.table.getQueryParam()}
-						).$promise.then(
+			rest.query({id:null, p:1, r:5, s:null, q:null}).$promise.then(
 							function(data){
 								$scope.table.data = data;
 								$scope.table.queryRunning = false;
 							},
 							function( error ){
-								$scope.table.errors.push(getErrorAsString(error));
+								$scope.table.errors.push(error.data.msg);
 								$scope.table.queryRunning = false;
 							});
 		}
     };
-
 	$scope.getTable = function() { return $scope.table };
-};
-
-// RESTEasy implementation !
-function getErrorAsString( error ){
-	var s = "";
-	for( var key in error.data ){
-		if(Array.isArray(error.data[key]))
-			for( var subkey in error.data[key] ){
-				s += error.data[key][subkey]['constraintType'];
-				s += " ";
-				s += error.data[key][subkey]['value'];
-				s += " : ";
-				s += error.data[key][subkey]['message'];
-				s += "\n";
-			}
-		else if(error.data[key]) s += ( error.data[key] + "\n" );
-	}
-	return s;
-};
-
-// Conferences UI ------------------------------------------------------------------------------------------------------
-myApp.factory('REST', ['$resource', function(r){ return r('rest/conferences/:id'); }]);
-
-myApp.controller("MainCtrl", ['$scope','uiGridConstants','rsql','REST','$log',
-	function( $scope, uiGridConstants, rsql, ConferenceREST, $log ) {
-
-	createDefaultTable( $scope, rsql, ConferenceREST );
-
-	$scope.getTable().columnDefs = [
-			{ name:'name', width:'25%', enableSorting: false, filter:
-					{ condition: uiGridConstants.filter.STARTS_WITH, placeholder: 'starts with ...'} },
-			{ name:'description', width:'49%', enableSorting: false, filter:
-					{ condition: uiGridConstants.filter.CONTAINS, placeholder: 'contains ...'} },
-			{ name:'from', width:'7%', type: 'date', cellFilter: 'date:"yyyy-MM-dd"', filters: [
-					{ condition: uiGridConstants.filter.GREATER_THAN_OR_EQUAL, placeholder: '>=', term: '2010-12-31' },
-					{ condition: uiGridConstants.filter.LESS_THAN_OR_EQUAL,	placeholder: '=<' }	] },
-			{ name:'to', width:'7%', type: 'date', cellFilter: 'date:"yyyy-MM-dd"', filters: [
-					{ condition: uiGridConstants.filter.GREATER_THAN_OR_EQUAL, placeholder: '>=' },
-                    { condition: uiGridConstants.filter.LESS_THAN_OR_EQUAL,	placeholder: '=<' }	] },
-			{ name:'location.name', width:'12%', displayName: 'Location', filter:
-					{ condition: uiGridConstants.filter.STARTS_WITH, placeholder: '* is a wildcard'} }
-		];
 
 	$scope.$log = $log;
 
-	$log.info('INFO logged');
+	$scope.$log.info('INFO logged');
 
-	$scope.count = 0;
-	$scope.$on('MyEvent', function() { $scope.count++; });
+//	$scope.count = 0;
+//	$scope.$on('MyEvent', function() { $scope.count++; });
 }]);
 
 // scope inheritance
@@ -305,3 +217,21 @@ beforeEach(inject(function($rootScope, $controller) {
 
 // decorator
 
+// config
+myApp.config( function($provide){ $provide.decorator('GridOptions', function($delegate){ return function(){
+
+	var defaultTable = new $delegate();
+
+	defaultTable.getRowIdentity   = function(row) { return row.id; };
+	defaultTable.enableRowHashing = false;
+
+	defaultTable.enableScrollbars     = false;
+	defaultTable.enableSorting        = true;
+	defaultTable.useExternalSorting   = true;
+	defaultTable.enableFiltering      = true;
+	defaultTable.useExternalFiltering = true;
+	defaultTable.minRowsToShow        = 1;
+	defaultTable.virtualizationThreshold = 99;
+
+	return defaultTable;
+};})});
