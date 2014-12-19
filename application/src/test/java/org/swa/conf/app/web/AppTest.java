@@ -9,7 +9,6 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,21 +16,7 @@ public class AppTest extends AngularTestUtil {
 
 	@BeforeClass
 	public static void setup1() throws Exception {
-		loadInvariants("myApp",
-				"lib/angularjs/angular-touch.min.js",
-				"lib/angularjs/angular-animate.min.js",
-				"lib/angularjs/angular-resource.min.js",
-				"lib/angularjs/angular-route.min.js",
-				"lib/angular-ui/ui-bootstrap.js",
-				"lib/angular-ui/ui-grid.js",
-				"lib/angular-ui/ui-router.js",
-				"lib/date-format.js"
-		);
-	}
-
-	@Before
-	public void setupN() throws Exception {
-		loadApp("script/myApp.js");
+		loadApp("myApp");
 	}
 
 	@Test

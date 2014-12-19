@@ -1,6 +1,5 @@
 package org.swa.conf.app.web;
 
-import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -30,50 +29,33 @@ class AngularTestUtil {
 	// MAVEN's <project>/webapp folder
 	static String WebAppDir;
 
-	/** Load AngularJS and the App to be tested, may be from a @BeforeClass method */
-	static void loadInvariants(final String appName, final String... scripts) throws Exception {
+	/** Load Env.js and AngularJS from @BeforeClass method */
+	static void loadApp(final String appName) throws Exception {
 
 		APP_MODULE = appName;
 
 		final Class THIS = AngularTestUtil.class;
 
 		// MAVEN puts compiled test classes under <project>/target/.... directory
-		WebAppDir = THIS.getResource("").getPath().split("target")[0] + "src/main/webapp/";
+		final String projectDir = THIS.getResource("").getPath().split("target")[0];
+		WebAppDir = projectDir + "src/main/webapp/";
 
-		// first, load browser object mocks
-		exec("   var window = { length : 0, location : {}, name : 'NG_ENABLE_DEBUG_INFO!' };" +
-				"var document = { " +
-				"  addEventListener       : function(){}," +
-				"  createDocumentFragment : function(){ return{ appendChild:function(){ return { childNodes:[] };}," +
-				"                                               firstChild :{textContent:''} }; }," +
-				"  createElement          : function(){ return{ pathname:'', setAttribute:function(){} }; }," +
-				"  querySelector          : function(){}" +
-				"};");
-
-		// then load AngularJS from local storage (no dependency to (inter)net for our JUnit tests ...)
-		E.eval(new FileReader(WebAppDir + "lib/angularjs/angular.js"));
-
-		// in a real browser, window.X is a global variable X. Fake it here ...
-		exec("var angular=window.angular");
+		// first, load env.js (browser mock)
+		exec(new String(Files.readAllBytes(Paths.get(THIS.getResource("/env_nashorn.js").toURI()))));
+		// enable loading javascript from </script>
+		exec("Envjs.scriptTypes['text/javascript'] = true;");
+		exec("window.name = 'NG_ENABLE_DEBUG_INFO!';  window.location = 'file:///" + WebAppDir + "index.html';");
 
 		// load AngularJS mocks
 		exec(new String(Files.readAllBytes(Paths.get(THIS.getResource("/angular-mocks.js").toURI()))));
 
-		// load all script dependencies
-		for (final String s : scripts) E.eval(new FileReader(WebAppDir + s));
-	}
-
-	/** Reload the App to be tested, may be from a @Before method */
-	void loadApp(final String... scripts) throws Exception {
-		// load all script dependencies
-		for (final String s : scripts) E.eval(new FileReader(WebAppDir + s));
-		// let depend the tested App on ngMock (using a new dummy module)
+		// load test decorator module
 		exec("angular.module('" + APP_MODULE + TEST_SUFFIX + "', ['ngMock','" + APP_MODULE + "']);");
 	}
 
 	/** Bootstrap the App */
 	void boot() {
-		// boot the App-Wrapper and store the main findector
+		// boot the App-Wrapper and store the main $injector
 		E.put("$INJ", exec("angular.bootstrap(document, ['" + APP_MODULE + TEST_SUFFIX + "']);"));
 	}
 
@@ -177,7 +159,7 @@ class AngularTestUtil {
 				};
 			}
 		});
-		exec("angular.module('" + APP_MODULE + TEST_SUFFIX + "').constant('" + mockName + "',_$Mock);");
+		exec("angular.module('" + APP_MODULE + TEST_SUFFIX + "').value('" + mockName + "',_$Mock);");
 	}
 
 	/** Get json object builder and save 20 characters on the screen ;-) */
