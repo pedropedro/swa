@@ -168,7 +168,7 @@ myApp.filter('reverse', function() {
 
 
 // controller
-myApp.controller("MainCtrl", ['$scope','$resource','$log', function( $scope, $resource, $log ) {
+myApp.controller('MainCtrl', ['$scope','$resource','$log', function( $scope, $resource, $log ) {
 
 	var rest = $resource('rest/conferences/:id');
 
@@ -202,7 +202,7 @@ myApp.controller("MainCtrl", ['$scope','$resource','$log', function( $scope, $re
 }]);
 
 // scope inheritance
-myApp.controller("ChildCtrl", ['$scope', function(childScope){
+myApp.controller('ChildCtrl', ['$scope', function(childScope){
 /*
 beforeEach(inject(function($rootScope, $controller) {
     mainScope = $rootScope.$new();
@@ -218,7 +218,9 @@ beforeEach(inject(function($rootScope, $controller) {
 // decorator
 
 // config
-myApp.config( function($provide){ $provide.decorator('GridOptions', function($delegate){ return function(){
+myApp.config(['$provide', function($provide){
+
+	$provide.decorator('GridOptions', ['$delegate', function($delegate){ return function(){
 
 	var defaultTable = new $delegate();
 
@@ -234,4 +236,12 @@ myApp.config( function($provide){ $provide.decorator('GridOptions', function($de
 	defaultTable.virtualizationThreshold = 99;
 
 	return defaultTable;
-};})});
+};}])}]);
+
+myApp.config(['$locationProvider', function($locationProvider) {
+  $locationProvider.html5Mode(true).hashPrefix('§§§');
+}]);
+
+myApp.config(['$compileProvider', function ($compileProvider) {
+  $compileProvider.debugInfoEnabled(false);
+}]);

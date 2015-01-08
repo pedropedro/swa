@@ -2368,7 +2368,7 @@ __extend__(Node.prototype, {
         }
     },
     hasAttributes : function() {
-        if (this.attributes.length == 0) {
+        if (!this.attributes || this.attributes.length == 0) {
             return false;
         }else{
             return true;
@@ -5019,7 +5019,38 @@ __extend__(Document.prototype,{
             return window.getComputedStyle(elem);
         }};
     },
-    querySelector: function(){ return null; }
+    querySelector: function(s){
+        if (!s || !(typeof s === 'string' || s instanceof String) || s.length == 0) return null;
+
+        var attrName, attrValue;
+
+             if(s.charAt(0)==='#') { attrName = 'id'; attrValue = s; }
+        else if(s.charAt(0)==='.') { attrName = 'class'; attrValue = s; }
+        else if(s.charAt(0)==='[') {
+                                     var eqIx = s.indexOf('=',2);
+                                     if(eqIx == -1) {
+                                        attrName = s.substring(1, s.length - 1);
+                                        attrValue = '*';
+                                     }
+                                     else {
+                                        attrName = s.substring(1, eqIx - 1);
+                                        attrValue = s.substring(eqIx + 1, s.length - 1);
+                                     }
+                                   }
+
+        if(!attrName) return null;
+
+        var allNodes = this.all;
+        for (var i=0; i < allNodes.length; i++) {
+        	for( var a=0; a < allNodes[i].attributes.length; a++)
+        	    if(    allNodes[i].attributes[a].nodeName === attrName
+        	        && (    attrValue === '*'
+        	             || attrValue === allNodes[i].attributes[a].nodeValue )
+        	      ) return allNodes[i];
+        }
+
+        return null;
+    }
 });
 
 /*

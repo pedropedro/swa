@@ -16,7 +16,7 @@ public class AppTest extends AngularTestUtil {
 
 	@BeforeClass
 	public static void setup1() throws Exception {
-		loadApp("myApp");
+		loadApp("myApp", "myIndex.html");
 	}
 
 	@Test

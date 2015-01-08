@@ -30,7 +30,7 @@ class AngularTestUtil {
 	static String WebAppDir;
 
 	/** Load Env.js and AngularJS from @BeforeClass method */
-	static void loadApp(final String appName) throws Exception {
+	static void loadApp(final String appName, final String mainHtmlPageName) throws Exception {
 
 		APP_MODULE = appName;
 
@@ -40,22 +40,22 @@ class AngularTestUtil {
 		final String projectDir = THIS.getResource("").getPath().split("target")[0];
 		WebAppDir = projectDir + "src/main/webapp/";
 
-		// first, load env.js (browser mock)
+		// first, load env.js (browser mock) - @see http://www.envjs.com
 		exec(new String(Files.readAllBytes(Paths.get(THIS.getResource("/env_nashorn.js").toURI()))));
-		// enable loading javascript from </script>
-		exec("Envjs.scriptTypes['text/javascript'] = true;");
-		exec("window.name = 'NG_ENABLE_DEBUG_INFO!';  window.location = 'file:///" + WebAppDir + "index.html';");
+		// enable loading anonymous, inline and tagged (</script>) javascript code
+		exec("Envjs.scriptTypes['text/javascript']=true;    Envjs.scriptTypes['']=true;");
+		exec("window.name='NG_DEFER_BOOTSTRAP!';  window.location='file:///" + WebAppDir + mainHtmlPageName + "';");
 
 		// load AngularJS mocks
 		exec(new String(Files.readAllBytes(Paths.get(THIS.getResource("/angular-mocks.js").toURI()))));
 
-		// load test decorator module
+		// load test decorator module with dependency on ngMock
 		exec("angular.module('" + APP_MODULE + TEST_SUFFIX + "', ['ngMock','" + APP_MODULE + "']);");
 	}
 
 	/** Bootstrap the App */
 	void boot() {
-		// boot the App-Wrapper and store the main $injector
+		// boot the App-Wrapper and save the main $injector
 		E.put("$INJ", exec("angular.bootstrap(document, ['" + APP_MODULE + TEST_SUFFIX + "']);"));
 	}
 
