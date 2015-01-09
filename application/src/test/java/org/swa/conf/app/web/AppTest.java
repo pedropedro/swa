@@ -10,6 +10,7 @@ import javax.json.JsonObject;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AppTest extends AngularTestUtil {
@@ -213,12 +214,6 @@ public class AppTest extends AngularTestUtil {
 		Assert.assertEquals("Mark", filteredArray.get(1));
 	}
 
-	/* ControllerEmitTest ControllerBroadcastTest
-	  <button ng-click="$emit('MyEvent')">$emit('MyEvent')</button>
-      <button ng-click="$broadcast('MyEvent')">$broadcast('MyEvent')</button>
-
-	*/
-
 	@Test
 	public void controllerTest() {
 
@@ -252,9 +247,12 @@ public class AppTest extends AngularTestUtil {
 		// get and run our query (send $resource request) and "wait" until server has responded
 		inspectScope("getTable().query()");
 
+		Assert.assertTrue((Boolean) inspectScope("getTable().queryRunning"));
+
 		// simulate server response arrival
 		http.flush(1, true);
 
+		Assert.assertFalse((Boolean) inspectScope("getTable().queryRunning"));
 		http.verifyNoOutstandingRequest();
 
 		// A boolean flag injected by AngularJS into the server response
@@ -281,8 +279,14 @@ public class AppTest extends AngularTestUtil {
 		http.expectGET("rest/conferences?p=1&r=5", HttpMock.IGNORE).callMember("respond", 500,
 				newJson("msg", "java.sprache.NullPointerException at row 42"));
 
+		// get and run our query (send $resource request) and "wait" until server has responded
 		inspectScope("getTable().query()");
+		Assert.assertTrue((Boolean) inspectScope("getTable().queryRunning"));
+
+		// simulate server response arrival
 		http.flush(1, true);
+
+		Assert.assertFalse((Boolean) inspectScope("getTable().queryRunning"));
 		http.verifyNoOutstandingRequest();
 
 		Assert.assertEquals(EMPTY_JSON, inspectScope("getTable().data")); // no data received, just an exception
@@ -290,4 +294,61 @@ public class AppTest extends AngularTestUtil {
 		Assert.assertNull(inspectScope("getTable().errors.1"));
 	}
 
+	@Test
+	public void scopeInheritanceTest() {
+
+		boot();
+
+		final Object parentScope = find("$rootScope");
+
+		execController("MainCtrl", getScopeMock(parentScope));
+		Assert.assertEquals("A", inspectScope("table.scopeInheritance", parentScope));
+		Assert.assertEquals("A", inspectScope("scopeInheritance", parentScope));
+
+		// child controller $scope inherits from parent's $scope
+		final Object childScope = cloneScope(parentScope);
+		Assert.assertEquals(1.0, inspectScope("$countChildScopes()", parentScope));
+		Assert.assertEquals(0.0, inspectScope("$countChildScopes()", childScope));
+
+		execController("ChildCtrl_1", getScopeMock(childScope));
+		Assert.assertEquals("A", inspectScope("table.scopeInheritance", childScope));
+		Assert.assertEquals("A", inspectScope("scopeInheritance", childScope));
+
+		// change parent scope -> the change must be propagated to the child
+		final Map<String, Object> parentScopeMap = (Map<String, Object>) parentScope;
+		((Map<String, Object>)parentScopeMap.get("table")).put("scopeInheritance", "X");
+		parentScopeMap.put("scopeInheritance", "X");
+		Assert.assertEquals("X", inspectScope("table.scopeInheritance", childScope));
+		Assert.assertEquals("X", inspectScope("scopeInheritance", childScope));
+
+		// change child scope -> the change must NOT be propagated to the parent for simple properties ONLY,
+		// objects (complex properties) are referenced !!! (i.e. not participating in JS prototype inheritance)
+		execController("ChildCtrl_2", getScopeMock(childScope));
+		Assert.assertEquals("I", inspectScope("table.scopeInheritance", parentScope));
+		Assert.assertEquals("X", inspectScope("scopeInheritance", parentScope));
+
+		Assert.assertEquals("I", inspectScope("table.scopeInheritance", childScope));
+		Assert.assertEquals("I", inspectScope("scopeInheritance", childScope));
+	}
+
+	@Test
+	@Ignore
+	public void TEST() {
+		exec("function P(){ this.a='a'; this.b={'x':'x'}; }; var p = new P();" +
+						"function Kind(){}; Kind.prototype=p;" +
+						"var child=new Kind(); print('a a:',p.a,child.a);" +
+						"p.a='a2'; print('a2 a2:',p.a,child.a);" +
+						"child.a='a1'; print('a2 a1:',p.a,child.a);" +
+						"print('x x:', p.b.x,child.b.x);" +
+						"p.b.x='x2'; print('x2 x2:',p.b.x,child.b.x);" +
+						"child.b.x='x1'; print('x1 x1:',p.b.x,child.b.x);" +
+						""
+		);
+	}
 }
+	/* ControllerEmitTest ControllerBroadcastTest
+	  <button ng-click="$emit('MyEvent')">$emit('MyEvent')</button>
+      <button ng-click="$broadcast('MyEvent')">$broadcast('MyEvent')</button>
+
+	*/
+

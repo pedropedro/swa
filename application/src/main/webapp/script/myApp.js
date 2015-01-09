@@ -4,6 +4,15 @@
 // Declare a new module with dependencies to be injected
 var myApp = angular.module('myApp', ['ngResource','ngAnimate','ngRoute','ui.grid','ui.grid.resizeColumns']);
 
+// common configuration
+myApp.config(['$locationProvider', function($locationProvider) {
+  $locationProvider.html5Mode(true).hashPrefix('§§§');
+}]);
+myApp.config(['$compileProvider', function ($compileProvider) {
+  $compileProvider.debugInfoEnabled(false);
+}]);
+
+
 // Define different flavours of Angular injectable services
 myApp.constant('myDiConst', 'C');
 
@@ -197,23 +206,20 @@ myApp.controller('MainCtrl', ['$scope','$resource','$log', function( $scope, $re
 
 	$scope.$log.info('INFO logged');
 
+	$scope.table.scopeInheritance = 'A';
+	$scope.scopeInheritance = 'A';
+
 //	$scope.count = 0;
 //	$scope.$on('MyEvent', function() { $scope.count++; });
 }]);
 
 // scope inheritance
-myApp.controller('ChildCtrl', ['$scope', function(childScope){
-/*
-beforeEach(inject(function($rootScope, $controller) {
-    mainScope = $rootScope.$new();
-    $controller('MainController', {$scope: mainScope});
-    childScope = mainScope.$new();
-    $controller('ChildController', {$scope: childScope});
-    grandChildScope = childScope.$new();
-    $controller('GrandChildController', {$scope: grandChildScope});
-}));
-*/
+myApp.controller('ChildCtrl_1', ['$scope', function($scope){ /* no change on $scope */ }]);
+myApp.controller('ChildCtrl_2', ['$scope', function($scope){
+	$scope.table.scopeInheritance = 'I';
+	$scope.scopeInheritance = 'I';
 }]);
+
 
 // decorator
 
@@ -237,11 +243,3 @@ myApp.config(['$provide', function($provide){
 
 	return defaultTable;
 };}])}]);
-
-myApp.config(['$locationProvider', function($locationProvider) {
-  $locationProvider.html5Mode(true).hashPrefix('§§§');
-}]);
-
-myApp.config(['$compileProvider', function ($compileProvider) {
-  $compileProvider.debugInfoEnabled(false);
-}]);

@@ -96,9 +96,9 @@ class AngularTestUtil {
 		return E.get("_$$$dst");
 	}
 
-	/** Retrieve $rootScope's property value located at "p1.p2.m1().p4.0.#!Z()" for example. */
-	Object inspectScope(final String propertyChain) {
-		Object rs = find("$rootScope");
+	/** Retrieve property value located in given $scope (default $rootScope) at "p1.p2.m1().p4.0.#!Z()" for example. */
+	Object inspectScope(final String propertyChain, final Object... inspectedScope) {
+		Object rs = inspectedScope.length == 0 ? find("$rootScope") : inspectedScope[0];
 		for (final String s : Arrays.asList(propertyChain.split("\\."))) {
 			if (rs == null) break;
 			if (s.endsWith("()")) rs = ((ScriptObjectMirror) rs).callMember(s.substring(0, s.length() - 2));
@@ -107,9 +107,14 @@ class AngularTestUtil {
 		return rs;
 	}
 
-	/** JS-Object with mocked $scope (from ngMock) */
-	Object getScopeMock() {
-		return newJson("$scope", find("$rootScope"));
+	/** JS-Object { $scope : SCOPE } with mocked AngularJS scope (default $rootScope) object */
+	Object getScopeMock(final Object... usingAngularScope) {
+		return newJson("$scope", usingAngularScope.length == 0 ? find("$rootScope") : usingAngularScope[0]);
+	}
+
+	/** Clone given AngularJS $scope to a new child scope */
+	ScriptObjectMirror cloneScope(final Object $scope) {
+		return (ScriptObjectMirror) call($scope, "$new");
 	}
 
 	HttpMock getMockHttp() {
@@ -177,7 +182,7 @@ class AngularTestUtil {
 		return exec("angular.fromJson('" + jsonStructure + "');");
 	}
 
-	/* Convert Javascript array to Java List<?> */
+	/* Convert Javascript Array instance to java.util.List<?> */
 	List<?> asList(final Object jsArray) {
 		return ((ScriptObjectMirror) jsArray).to(List.class);
 	}
