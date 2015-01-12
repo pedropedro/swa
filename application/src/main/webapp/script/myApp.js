@@ -208,13 +208,10 @@ myApp.controller('MainCtrl', ['$scope','$resource','$log', function( $scope, $re
 
 	$scope.table.scopeInheritance = 'A';
 	$scope.scopeInheritance = 'A';
-
-//	$scope.count = 0;
-//	$scope.$on('MyEvent', function() { $scope.count++; });
 }]);
 
 // scope inheritance
-myApp.controller('ChildCtrl_1', ['$scope', function($scope){ /* no change on $scope */ }]);
+myApp.controller('ChildCtrl_1', ['$scope', function($scope){ /* no change in $scope */ }]);
 myApp.controller('ChildCtrl_2', ['$scope', function($scope){
 	$scope.table.scopeInheritance = 'I';
 	$scope.scopeInheritance = 'I';

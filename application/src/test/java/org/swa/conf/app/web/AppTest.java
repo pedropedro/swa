@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -136,34 +134,29 @@ public class AppTest extends AngularTestUtil {
 		//						"LESS_THAN","LESS_THAN_OR_EQUAL","NOT_EQUAL"]
 
 		// no filter set
-		Assert.assertEquals("", find("rsql").callMember("getWhere", toJS(jObj().add("columns", jArr()).build())));
+		Assert.assertEquals("", find("rsql").callMember("getWhere", toJS("{'columns':[]}")));
 
 		// test every possible filter combination
-		final JsonObject uiGrid = jObj().add("columns", jArr()
-
-				.add(jObj().add("name", "COL1").add("filters", jArr()
-						.add(jObj().add("term", "EQ").add("condition", c.get("EXACT")))))
-
-				.add(jObj().add("name", "COL2").add("filters", jArr()
-						.add(jObj().add("term", "SW").add("condition", c.get("STARTS_WITH")))
-						.add(jObj().add("term", "EW").add("condition", c.get("ENDS_WITH")))
-						.add(jObj().add("term", "CT").add("condition", c.get("CONTAINS")))
-						.add(jObj().add("term", "NE").add("condition", c.get("NOT_EQUAL")))))
-
-				.add(jObj().add("name", "COL3").add("filters", jArr()
-						.add(jObj().add("term", "0").add("condition", c.get("GREATER_THAN")))
-						.add(jObj().add("term", "10").add("condition", c.get("LESS_THAN")))))
-
-				.add(jObj().add("name", "COL4").add("filters", jArr()
-						.add(jObj().add("term", "9").add("condition", c.get("LESS_THAN_OR_EQUAL")))
-						.add(jObj().add("term", "0").add("condition", c.get("GREATER_THAN_OR_EQUAL")))))).build();
-
+		String uiGrid = "{'columns':[" +
+				"{'name':'COL1','filters':[{'term':'EQ','condition':§EQ§}]}," +
+				"{'name':'COL2','filters':[{'term':'SW','condition':§SW§},{'term':'EW','condition':§EW§}," +
+				"                          {'term':'CT','condition':§CT§},{'term':'NE','condition':§NE§}]}," +
+				"{'name':'COL3','filters':[{'term':'0', 'condition':§GT§},{'term':'10','condition':§LT§}]}," +
+				"{'name':'COL4','filters':[{'term':'9','condition':§LTE§},{'term':'0','condition':§GTE§}]}" +
+				"]}";
+		uiGrid = uiGrid.replace("§EQ§", Integer.toString(c.get("EXACT")));
+		uiGrid = uiGrid.replace("§SW§", Integer.toString(c.get("STARTS_WITH")));
+		uiGrid = uiGrid.replace("§EW§", Integer.toString(c.get("ENDS_WITH")));
+		uiGrid = uiGrid.replace("§CT§", Integer.toString(c.get("CONTAINS")));
+		uiGrid = uiGrid.replace("§NE§", Integer.toString(c.get("NOT_EQUAL")));
+		uiGrid = uiGrid.replace("§GT§", Integer.toString(c.get("GREATER_THAN")));
+		uiGrid = uiGrid.replace("§LT§", Integer.toString(c.get("LESS_THAN")));
+		uiGrid = uiGrid.replace("§LTE§", Integer.toString(c.get("LESS_THAN_OR_EQUAL")));
+		uiGrid = uiGrid.replace("§GTE§", Integer.toString(c.get("GREATER_THAN_OR_EQUAL")));
 
 		Assert.assertEquals("COL1=='^EQ' and COL2=='^SW*' and COL2=='*EW' and COL2=='*CT*' and COL2!='NE' and " +
 						"COL3>'0' and COL3<'10' and COL4<='9' and COL4>='0'",
 				find("rsql").callMember("getWhere", toJS(uiGrid)));
-
-//		System.out.println("break point");
 	}
 
 	@Test
@@ -173,8 +166,8 @@ public class AppTest extends AngularTestUtil {
 
 		final String htmlTemplate = (String) findDirective("templateDir").get("template");
 
-		Assert.assertEquals("<p>ABC42</p>", evalExpression(htmlTemplate, extend("y", 1, newJson("x", 41))));
-		Assert.assertEquals("<p>ABCDE</p>", evalExpression(htmlTemplate, extend("y", "E", newJson("x", "D"))));
+		Assert.assertEquals("<p>ABC42</p>", evalExpression(htmlTemplate, toJS("{'y': 1 ,'x': 41}")));
+		Assert.assertEquals("<p>ABCDE</p>", evalExpression(htmlTemplate, toJS("{'y':'E','x':'D'}")));
 	}
 
 	@Test
@@ -184,9 +177,9 @@ public class AppTest extends AngularTestUtil {
 
 		final Object linkFunction = findDirective("linkDir").get("link");
 
-		exec(linkFunction, find("$rootScope"), newJson("element", "xxx"), newJson("attribute", "yyy"));
+		exec(linkFunction, find("$rootScope"), toJS("{'element':'xxx'}"), toJS("{'attribute':'yyy'}"));
 
-		Assert.assertEquals("xxxyyy", inspectScope("zzz"));
+		Assert.assertEquals("xxxyyy", inspectScope(String.class, "zzz"));
 
 	}
 
@@ -205,9 +198,7 @@ public class AppTest extends AngularTestUtil {
 		Assert.assertEquals("myCurr 123.00", execFilter("currency", "123", "myCurr "));
 
 		// built-in array filter
-		final Object inputArray = toJS(jArr().add("Ian").add("Yo").add("Mark").build());
-
-		final List<?> filteredArray = asList(execFilter("filter", inputArray, "a"));
+		final List<?> filteredArray = asList(execFilter("filter", toJS("['Ian','Yo','Mark']"), "a"));
 
 		Assert.assertEquals(2, filteredArray.size());
 		Assert.assertEquals("Ian", filteredArray.get(0));
@@ -223,49 +214,48 @@ public class AppTest extends AngularTestUtil {
 		execController("MainCtrl", getScopeMock());
 
 		// just to test the logging in our App
-		Assert.assertEquals("INFO logged", inspectScope("$log.info.logs.0.0"));
+		Assert.assertEquals("INFO logged", inspectScope(String.class, "$log.info.logs.0.0"));
 		// inspect $scope ...
-		Assert.assertNotNull(inspectScope("getTable()"));
-		Assert.assertEquals(EMPTY_JSON, inspectScope("getTable().errors"));
+		Assert.assertNotNull(inspectScope(null, "getTable()"));
+		Assert.assertTrue(inspectScope(Map.class, "getTable().errors").isEmpty());
 		// no http request == no data to display
-		Assert.assertEquals(EMPTY_JSON, inspectScope("getTable().data"));
+		Assert.assertTrue((inspectScope(Map.class, "getTable().data")).isEmpty());
 
 		// prepare server mock response
-		final JsonArray mockData = jArr()
-				.add(jObj().add("name", "Name 1").add("description", "D1")
-						.add("from", Instant.parse("2015-03-03T00:00:00Z").toEpochMilli())
-						.add("to", Instant.parse("2015-03-06T00:00:00Z").toEpochMilli())
-						.add("location", jObj().add("name", "Frankfurt")))
-				.add(jObj().add("name", "Name 5").add("description", "D8")
-						.add("from", Instant.parse("2015-07-12T00:00:00Z").toEpochMilli())
-						.add("to", Instant.parse("2015-07-12T00:00:00Z").toEpochMilli())
-						.add("location", jObj().add("name", "München"))).build();
+		String mockData = "[" +
+				"{'name':'Name 1','description':'D1','from':{0},'to':{1},'location':{'name':'Frankfurt'}}," +
+				"{'name':'Name 5','description':'D8','from':{2},'to':{3},'location':{'name':'München'}}" +
+				"]";
+		mockData = mockData.replace("{0}", Long.toString(Instant.parse("2015-03-03T00:00:00Z").toEpochMilli()));
+		mockData = mockData.replace("{1}", Long.toString(Instant.parse("2015-03-06T00:00:00Z").toEpochMilli()));
+		mockData = mockData.replace("{2}", Long.toString(Instant.parse("2015-07-12T00:00:00Z").toEpochMilli()));
+		mockData = mockData.replace("{3}", Long.toString(Instant.parse("2015-07-12T00:00:00Z").toEpochMilli()));
 
 		final HttpMock http = getMockHttp();
 		http.expectGET("rest/conferences?p=1&r=5", HttpMock.IGNORE).callMember("respond", toJS(mockData));
 
 		// get and run our query (send $resource request) and "wait" until server has responded
-		inspectScope("getTable().query()");
+		inspectScope(null, "getTable().query()");
 
-		Assert.assertTrue((Boolean) inspectScope("getTable().queryRunning"));
+		Assert.assertTrue(inspectScope(Boolean.class, "getTable().queryRunning"));
 
 		// simulate server response arrival
 		http.flush(1, true);
 
-		Assert.assertFalse((Boolean) inspectScope("getTable().queryRunning"));
+		Assert.assertFalse(inspectScope(Boolean.class, "getTable().queryRunning"));
 		http.verifyNoOutstandingRequest();
 
 		// A boolean flag injected by AngularJS into the server response
-		Assert.assertTrue((Boolean) inspectScope("getTable().data.$resolved"));
+		Assert.assertTrue(inspectScope(Boolean.class, "getTable().data.$resolved"));
 
 		// first row
-		Assert.assertEquals("Name 1", inspectScope("getTable().data.0.name"));
+		Assert.assertEquals("Name 1", inspectScope(String.class, "getTable().data.0.name"));
 		// second row
-		Assert.assertEquals("München", inspectScope("getTable().data.1.location.name"));
+		Assert.assertEquals("München", inspectScope(String.class, "getTable().data.1.location.name"));
 		// no more rows
-		Assert.assertNull(inspectScope("getTable().data.2"));
+		Assert.assertNull(inspectScope(null, "getTable().data.2"));
 		// no errors encountered
-		Assert.assertEquals(EMPTY_JSON, inspectScope("getTable().errors"));
+		Assert.assertTrue(inspectScope(Map.class, "getTable().errors").isEmpty());
 	}
 
 	@Test
@@ -277,21 +267,23 @@ public class AppTest extends AngularTestUtil {
 
 		final HttpMock http = getMockHttp();
 		http.expectGET("rest/conferences?p=1&r=5", HttpMock.IGNORE).callMember("respond", 500,
-				newJson("msg", "java.sprache.NullPointerException at row 42"));
+				toJS("{'msg':'java.sprache.NullPointerException at row 42'}"));
 
 		// get and run our query (send $resource request) and "wait" until server has responded
-		inspectScope("getTable().query()");
-		Assert.assertTrue((Boolean) inspectScope("getTable().queryRunning"));
+		inspectScope(null, "getTable().query()");
+		Assert.assertTrue(inspectScope(Boolean.class, "getTable().queryRunning"));
 
 		// simulate server response arrival
 		http.flush(1, true);
 
-		Assert.assertFalse((Boolean) inspectScope("getTable().queryRunning"));
+		Assert.assertFalse(inspectScope(Boolean.class, "getTable().queryRunning"));
 		http.verifyNoOutstandingRequest();
 
-		Assert.assertEquals(EMPTY_JSON, inspectScope("getTable().data")); // no data received, just an exception
-		Assert.assertEquals("java.sprache.NullPointerException at row 42", inspectScope("getTable().errors.0"));
-		Assert.assertNull(inspectScope("getTable().errors.1"));
+		// no data received, just an exception
+		Assert.assertTrue(inspectScope(Map.class, "getTable().data").isEmpty());
+		Assert.assertEquals("java.sprache.NullPointerException at row 42",
+				inspectScope(String.class, "getTable().errors.0"));
+		Assert.assertNull(inspectScope(null, "getTable().errors.1"));
 	}
 
 	@Test
@@ -302,33 +294,110 @@ public class AppTest extends AngularTestUtil {
 		final Object parentScope = find("$rootScope");
 
 		execController("MainCtrl", getScopeMock(parentScope));
-		Assert.assertEquals("A", inspectScope("table.scopeInheritance", parentScope));
-		Assert.assertEquals("A", inspectScope("scopeInheritance", parentScope));
+		Assert.assertEquals("A", inspectScope(String.class, "table.scopeInheritance", parentScope));
+		Assert.assertEquals("A", inspectScope(String.class, "scopeInheritance", parentScope));
 
 		// child controller $scope inherits from parent's $scope
 		final Object childScope = cloneScope(parentScope);
-		Assert.assertEquals(1.0, inspectScope("$countChildScopes()", parentScope));
-		Assert.assertEquals(0.0, inspectScope("$countChildScopes()", childScope));
+		Assert.assertEquals(1.0, inspectScope(Number.class, "$countChildScopes()", parentScope));
+		Assert.assertEquals(0.0, inspectScope(Number.class, "$countChildScopes()", childScope));
 
 		execController("ChildCtrl_1", getScopeMock(childScope));
-		Assert.assertEquals("A", inspectScope("table.scopeInheritance", childScope));
-		Assert.assertEquals("A", inspectScope("scopeInheritance", childScope));
+		Assert.assertEquals("A", inspectScope(String.class, "table.scopeInheritance", childScope));
+		Assert.assertEquals("A", inspectScope(String.class, "scopeInheritance", childScope));
 
-		// change parent scope -> the change must be propagated to the child
+		// a change in parent scope -> the change must be propagated to the child
 		final Map<String, Object> parentScopeMap = (Map<String, Object>) parentScope;
-		((Map<String, Object>)parentScopeMap.get("table")).put("scopeInheritance", "X");
+		((Map<String, Object>) parentScopeMap.get("table")).put("scopeInheritance", "X");
 		parentScopeMap.put("scopeInheritance", "X");
-		Assert.assertEquals("X", inspectScope("table.scopeInheritance", childScope));
-		Assert.assertEquals("X", inspectScope("scopeInheritance", childScope));
+		Assert.assertEquals("X", inspectScope(String.class, "table.scopeInheritance", childScope));
+		Assert.assertEquals("X", inspectScope(String.class, "scopeInheritance", childScope));
 
-		// change child scope -> the change must NOT be propagated to the parent for simple properties ONLY,
+		// a change in child scope -> the change must NOT be propagated to the parent for simple properties ONLY,
 		// objects (complex properties) are referenced !!! (i.e. not participating in JS prototype inheritance)
 		execController("ChildCtrl_2", getScopeMock(childScope));
-		Assert.assertEquals("I", inspectScope("table.scopeInheritance", parentScope));
-		Assert.assertEquals("X", inspectScope("scopeInheritance", parentScope));
+		Assert.assertEquals("I", inspectScope(String.class, "table.scopeInheritance", parentScope));
+		Assert.assertEquals("X", inspectScope(String.class, "scopeInheritance", parentScope));
 
-		Assert.assertEquals("I", inspectScope("table.scopeInheritance", childScope));
-		Assert.assertEquals("I", inspectScope("scopeInheritance", childScope));
+		Assert.assertEquals("I", inspectScope(String.class, "table.scopeInheritance", childScope));
+		Assert.assertEquals("I", inspectScope(String.class, "scopeInheritance", childScope));
+	}
+
+	@Test
+	public void eventEmitTest() {
+
+		boot();
+
+		// prepare a $scope hierarchy
+		final Object $rs = find("$rootScope");
+		final Object $cs1 = cloneScope($rs);
+		final Object $cs2 = cloneScope($cs1);
+		final Object $cs3 = cloneScope($cs2);
+		final Object $cs4 = cloneScope($cs3);
+
+		// collect listener test output into a global variable
+		exec("var $$TEST$$_notificationChain = [];");
+
+		// let $emit('MyEvent') from the $cs3:
+		// - $cs4 may not be notified (is underneath the $cs3)
+		// - $cs3(itself!), $cs2 and $cs1 must get notified
+		// - $cs1 listener stops the event propagation, so
+		// - $rs may not get notified
+
+		// register listeners
+		call($rs, "$on", "MyEvent", exec("function(e){throw new Error('$rootScope got notified !');}"));
+		call($cs1, "$on", "MyEvent", exec("function(e){$$TEST$$_notificationChain.push('$cs1');e.stopPropagation()}"));
+		call($cs2, "$on", "MyEvent", exec("function(e,p){$$TEST$$_notificationChain.push('$cs2' + p['param1'])}"));
+		call($cs3, "$on", "MyEvent", exec("function(e){$$TEST$$_notificationChain.push('$cs3')}"));
+		call($cs4, "$on", "MyEvent", exec("function(e){throw new Error('$cs4 got notified !');}"));
+
+		// let's emit
+		call($cs3, "$emit", "MyEvent", toJS("{'param1':'x'}"));
+
+		final Map<String, Object> result = (Map<String, Object>) E.get("$$TEST$$_notificationChain");
+		Assert.assertNotNull(result);
+		Assert.assertEquals("$cs3", result.get("0"));
+		Assert.assertEquals("$cs2x", result.get("1"));
+		Assert.assertEquals("$cs1", result.get("2"));
+		Assert.assertNull(result.get("3")); // no more listener
+	}
+
+	@Test
+	public void eventBroadcastTest() {
+
+		boot();
+
+		// prepare a $scope hierarchy
+		final Object $rs = find("$rootScope");
+		final Object $cs1 = cloneScope($rs);
+		final Object $cs2 = cloneScope($cs1);
+		final Object $cs3 = cloneScope($cs2);
+		final Object $cs4 = cloneScope($cs3);
+
+		// collect listener test output into a global variable
+		exec("var $$TEST$$_notificationChain = [];");
+
+		// let $emit('MyEvent') from the $cs1:
+		// - $rs may not be notified (is above the $cs1)
+		// - $cs1(itself!) and all child scopes must get notified - propagation of a broadcast event cannot be stopped
+
+		// register listeners
+		call($rs, "$on", "MyEvent", exec("function(e){throw new Error('$rootScope got notified !');}"));
+		call($cs1, "$on", "MyEvent", exec("function(e){$$TEST$$_notificationChain.push('$cs1')}"));
+		call($cs2, "$on", "MyEvent", exec("function(e){$$TEST$$_notificationChain.push('$cs2')}"));
+		call($cs3, "$on", "MyEvent", exec("function(e){$$TEST$$_notificationChain.push('$cs3')}"));
+		call($cs4, "$on", "MyEvent", exec("function(e,p){$$TEST$$_notificationChain.push('$cs4' + p['param1'])}"));
+
+		// let's emit
+		call($cs1, "$broadcast", "MyEvent", toJS("{'param1':'y'}"));
+
+		final Map<String, Object> result = (Map<String, Object>) E.get("$$TEST$$_notificationChain");
+		Assert.assertNotNull(result);
+		Assert.assertEquals("$cs1", result.get("0"));
+		Assert.assertEquals("$cs2", result.get("1"));
+		Assert.assertEquals("$cs3", result.get("2"));
+		Assert.assertEquals("$cs4y", result.get("3"));
+		Assert.assertNull(result.get("4")); // no more listener
 	}
 
 	@Test
@@ -346,9 +415,3 @@ public class AppTest extends AngularTestUtil {
 		);
 	}
 }
-	/* ControllerEmitTest ControllerBroadcastTest
-	  <button ng-click="$emit('MyEvent')">$emit('MyEvent')</button>
-      <button ng-click="$broadcast('MyEvent')">$broadcast('MyEvent')</button>
-
-	*/
-

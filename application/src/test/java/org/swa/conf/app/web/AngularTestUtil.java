@@ -6,11 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonStructure;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -23,7 +18,6 @@ class AngularTestUtil {
 
 	static final ScriptEngine E = new ScriptEngineManager().getEngineByName("nashorn");
 	static final Invocable I = (Invocable) E;
-	static final JsonObject EMPTY_JSON = Json.createObjectBuilder().build();
 	static String APP_MODULE;
 	static final String TEST_SUFFIX = "$Test$";
 	// MAVEN's <project>/webapp folder
@@ -82,34 +76,22 @@ class AngularTestUtil {
 		return (ScriptObjectMirror) call(E.get("$INJ"), "get", params);
 	}
 
-	/** Create new JS-Object with given Property */
-	Object newJson(final String propertyName, final Object propertyObj) {
-		return extend(propertyName, propertyObj, null);
-	}
-
-	/** Extend existing JS-Object with given Property */
-	Object extend(final String propertyName, final Object propertyObj, final Object destination) {
-		E.put("_$$$key", propertyName);
-		E.put("_$$$val", propertyObj);
-		E.put("_$$$dst", destination);
-		exec("_$$$dst=_$$$dst||{}; _$$$dst[_$$$key]=_$$$val;");
-		return E.get("_$$$dst");
-	}
-
 	/** Retrieve property value located in given $scope (default $rootScope) at "p1.p2.m1().p4.0.#!Z()" for example. */
-	Object inspectScope(final String propertyChain, final Object... inspectedScope) {
+	@SuppressWarnings("unchecked")
+	<R> R inspectScope(final Class<R> _, final String propertyChain, final Object... inspectedScope) {
 		Object rs = inspectedScope.length == 0 ? find("$rootScope") : inspectedScope[0];
 		for (final String s : Arrays.asList(propertyChain.split("\\."))) {
 			if (rs == null) break;
 			if (s.endsWith("()")) rs = ((ScriptObjectMirror) rs).callMember(s.substring(0, s.length() - 2));
 			else rs = ((Map<String, Object>) rs).get(s);
 		}
-		return rs;
+		return (R) rs;
 	}
 
 	/** JS-Object { $scope : SCOPE } with mocked AngularJS scope (default $rootScope) object */
 	Object getScopeMock(final Object... usingAngularScope) {
-		return newJson("$scope", usingAngularScope.length == 0 ? find("$rootScope") : usingAngularScope[0]);
+		E.put("$$SCOPE$$", usingAngularScope.length == 0 ? find("$rootScope") : usingAngularScope[0]);
+		return exec("(function(){return {'$scope': $$SCOPE$$};})()");
 	}
 
 	/** Clone given AngularJS $scope to a new child scope */
@@ -167,19 +149,9 @@ class AngularTestUtil {
 		exec("angular.module('" + APP_MODULE + TEST_SUFFIX + "').value('" + mockName + "',_$Mock);");
 	}
 
-	/** Get json object builder and save 20 characters on the screen ;-) */
-	JsonObjectBuilder jObj() {
-		return Json.createObjectBuilder();
-	}
-
-	/** Get json array builder and save 19 characters on the screen ;-) */
-	JsonArrayBuilder jArr() {
-		return Json.createArrayBuilder();
-	}
-
-	/** Convert javax.json.JsonStructure to native JavaScript object */
-	Object toJS(final JsonStructure jsonStructure) {
-		return exec("angular.fromJson('" + jsonStructure + "');");
+	/** Convert String to native JavaScript object */
+	Object toJS(final String jsonStructure) {
+		return exec("angular.fromJson('" + jsonStructure.replace("'", "\"") + "');");
 	}
 
 	/* Convert Javascript Array instance to java.util.List<?> */
