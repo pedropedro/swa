@@ -1,6 +1,7 @@
 package org.swa.conf.app.web;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class AppTest extends AngularTestUtil {
 		boot();
 
 		// myService without configuration gets injected the real myDiFactory and myDiService objects:
-		// f5() := n*n,  f4() := 'C' + ( <param> + 21 )
+		// f5(n) := n*n,  f4(p) := 'C' + ( p + 21 )
 		Assert.assertEquals(9.0, find("myService").callMember("f5", 3));
 		Assert.assertEquals("CS21", find("myService").callMember("f4", "S"));
 		// Javascript is quite dynamic ...
@@ -335,31 +336,30 @@ public class AppTest extends AngularTestUtil {
 		final Object $cs3 = cloneScope($cs2);
 		final Object $cs4 = cloneScope($cs3);
 
-		// collect listener test output into a global variable
-		exec("var $$TEST$$_notificationChain = [];");
+		// collect listener test output
+		final List<String> notificationChain = new ArrayList<>();
+		E.put("NC", notificationChain);
 
-		// let $emit('MyEvent') from the $cs3:
+		// let's $emit('MyEvent') from the $cs3:
 		// - $cs4 may not be notified (is underneath the $cs3)
 		// - $cs3(itself!), $cs2 and $cs1 must get notified
 		// - $cs1 listener stops the event propagation, so
 		// - $rs may not get notified
 
 		// register listeners
-		call($rs, "$on", "MyEvent", exec("function(e){throw new Error('$rootScope got notified !');}"));
-		call($cs1, "$on", "MyEvent", exec("function(e){$$TEST$$_notificationChain.push('$cs1');e.stopPropagation()}"));
-		call($cs2, "$on", "MyEvent", exec("function(e,p){$$TEST$$_notificationChain.push('$cs2' + p['param1'])}"));
-		call($cs3, "$on", "MyEvent", exec("function(e){$$TEST$$_notificationChain.push('$cs3')}"));
-		call($cs4, "$on", "MyEvent", exec("function(e){throw new Error('$cs4 got notified !');}"));
+		call($rs, "$on", "MyEvent", exec("function(e)   {throw new Error('$rootScope got notified !');}"));
+		call($cs1, "$on", "MyEvent", exec("function(e)  {NC.add('$cs1'); e.stopPropagation()}"));
+		call($cs2, "$on", "MyEvent", exec("function(e,p){NC.add('$cs2' + p['param1'])}"));
+		call($cs3, "$on", "MyEvent", exec("function(e)  {NC.add('$cs3')}"));
+		call($cs4, "$on", "MyEvent", exec("function(e)  {throw new Error('$cs4 got notified !');}"));
 
 		// let's emit
 		call($cs3, "$emit", "MyEvent", toJS("{'param1':'x'}"));
 
-		final Map<String, Object> result = (Map<String, Object>) E.get("$$TEST$$_notificationChain");
-		Assert.assertNotNull(result);
-		Assert.assertEquals("$cs3", result.get("0"));
-		Assert.assertEquals("$cs2x", result.get("1"));
-		Assert.assertEquals("$cs1", result.get("2"));
-		Assert.assertNull(result.get("3")); // no more listener
+		Assert.assertEquals(3, notificationChain.size());
+		Assert.assertEquals("$cs3", notificationChain.get(0));
+		Assert.assertEquals("$cs2x", notificationChain.get(1));
+		Assert.assertEquals("$cs1", notificationChain.get(2));
 	}
 
 	@Test
@@ -374,30 +374,43 @@ public class AppTest extends AngularTestUtil {
 		final Object $cs3 = cloneScope($cs2);
 		final Object $cs4 = cloneScope($cs3);
 
-		// collect listener test output into a global variable
-		exec("var $$TEST$$_notificationChain = [];");
+		// collect listener test output
+		final List<String> notificationChain = new ArrayList<>();
+		E.put("NC", notificationChain);
 
-		// let $emit('MyEvent') from the $cs1:
+		// let's $broadcast('MyEvent') from the $cs1:
 		// - $rs may not be notified (is above the $cs1)
 		// - $cs1(itself!) and all child scopes must get notified - propagation of a broadcast event cannot be stopped
 
 		// register listeners
-		call($rs, "$on", "MyEvent", exec("function(e){throw new Error('$rootScope got notified !');}"));
-		call($cs1, "$on", "MyEvent", exec("function(e){$$TEST$$_notificationChain.push('$cs1')}"));
-		call($cs2, "$on", "MyEvent", exec("function(e){$$TEST$$_notificationChain.push('$cs2')}"));
-		call($cs3, "$on", "MyEvent", exec("function(e){$$TEST$$_notificationChain.push('$cs3')}"));
-		call($cs4, "$on", "MyEvent", exec("function(e,p){$$TEST$$_notificationChain.push('$cs4' + p['param1'])}"));
+		call($rs, "$on", "MyEvent", exec("function(e)   {throw new Error('$rootScope got notified !');}"));
+		call($cs1, "$on", "MyEvent", exec("function(e)  {NC.add('$cs1')}"));
+		call($cs2, "$on", "MyEvent", exec("function(e)  {NC.add('$cs2')}"));
+		call($cs3, "$on", "MyEvent", exec("function(e)  {NC.add('$cs3')}"));
+		call($cs4, "$on", "MyEvent", exec("function(e,p){NC.add('$cs4' + p['param1'])}"));
 
 		// let's emit
 		call($cs1, "$broadcast", "MyEvent", toJS("{'param1':'y'}"));
 
-		final Map<String, Object> result = (Map<String, Object>) E.get("$$TEST$$_notificationChain");
-		Assert.assertNotNull(result);
-		Assert.assertEquals("$cs1", result.get("0"));
-		Assert.assertEquals("$cs2", result.get("1"));
-		Assert.assertEquals("$cs3", result.get("2"));
-		Assert.assertEquals("$cs4y", result.get("3"));
-		Assert.assertNull(result.get("4")); // no more listener
+		Assert.assertEquals(4, notificationChain.size());
+		Assert.assertEquals("$cs1", notificationChain.get(0));
+		Assert.assertEquals("$cs2", notificationChain.get(1));
+		Assert.assertEquals("$cs3", notificationChain.get(2));
+		Assert.assertEquals("$cs4y", notificationChain.get(3));
+	}
+
+	@Test
+	public void decoratorTest() {
+
+		boot();
+
+		// myServiceToBeDecorated:  f5(n) := n*n,  f4(p) := 'C' + ( p + 21 )
+		// the decorator: f5(n) := 7,     f4(p) := 'Augmented_' + f4_orig(p)
+		Assert.assertEquals(7, find("myServiceToBeDecorated").callMember("f5", 3));
+		Assert.assertEquals("Augmented_CS21", find("myServiceToBeDecorated").callMember("f4", "S"));
+		// Javascript is quite dynamic ...
+		Assert.assertEquals("Augmented_C0", find("myServiceToBeDecorated").callMember("f4", -21));
+
 	}
 
 	@Test

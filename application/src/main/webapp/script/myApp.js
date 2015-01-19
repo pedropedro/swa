@@ -218,25 +218,28 @@ myApp.controller('ChildCtrl_2', ['$scope', function($scope){
 }]);
 
 
-// decorator
+// config & decorator
+myApp.service('myServiceToBeDecorated', ['myDiFactory','myDiService', function(f,s){
+	this.factory = f;
+	this.service = s;
+	this.f4 = function(b){return this.factory.f1() + this.service.f3(b)};
+	this.f5 = function(n){return this.factory.f2(n)};
+}]);
 
-// config
 myApp.config(['$provide', function($provide){
 
-	$provide.decorator('GridOptions', ['$delegate', function($delegate){ return function(){
+	$provide.decorator('myServiceToBeDecorated', ['$delegate', function($delegate){
 
-	var defaultTable = new $delegate();
+		// augment the f4()
+		var origF4closure = $delegate.f4;
 
-	defaultTable.getRowIdentity   = function(row) { return row.id; };
-	defaultTable.enableRowHashing = false;
+		$delegate.f4 = function() {
 
-	defaultTable.enableScrollbars     = false;
-	defaultTable.enableSorting        = true;
-	defaultTable.useExternalSorting   = true;
-	defaultTable.enableFiltering      = true;
-	defaultTable.useExternalFiltering = true;
-	defaultTable.minRowsToShow        = 1;
-	defaultTable.virtualizationThreshold = 99;
+			return 'Augmented_' + origF4closure.apply(this, arguments);
+		};
 
-	return defaultTable;
-};}])}]);
+		// replace the f5()
+		$delegate.f5 = function(n) { return 7; };
+
+		return $delegate;
+}])}]);

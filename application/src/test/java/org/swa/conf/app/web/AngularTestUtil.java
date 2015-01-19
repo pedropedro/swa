@@ -6,24 +6,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 
 import jdk.nashorn.api.scripting.AbstractJSObject;
 import jdk.nashorn.api.scripting.JSObject;
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 class AngularTestUtil {
 
-	static final ScriptEngine E = new ScriptEngineManager().getEngineByName("nashorn");
+	static final ScriptEngine E = new NashornScriptEngineFactory().getScriptEngine(
+			new String[]{"-Dnashorn.time", "--locale=de_DE", "--global-per-engine"});
 	static final Invocable I = (Invocable) E;
-	static String APP_MODULE;
-	static final String TEST_SUFFIX = "$Test$";
-	// MAVEN's <project>/webapp folder
-	static String WebAppDir;
 
-	/** Load Env.js and AngularJS from @BeforeClass method */
+	private static final boolean MS$ = System.getProperty("os.name").contains("Windows");
+	private static String APP_MODULE;
+	private static final String TEST_SUFFIX = "$Test$";
+
+	/** Load browser mock and AngularJS from @BeforeClass method */
 	static void loadApp(final String appName, final String mainHtmlPageName) throws Exception {
 
 		APP_MODULE = appName;
@@ -32,18 +35,42 @@ class AngularTestUtil {
 
 		// MAVEN puts compiled test classes under <project>/target/.... directory
 		final String projectDir = THIS.getResource("").getPath().split("target")[0];
-		WebAppDir = projectDir + "src/main/webapp/";
+		// MAVEN's <project>/webapp folder
+		final String webAppDir = (MS$ ? projectDir.substring(1) : projectDir) + "src/main/webapp/";
 
-		// first, load env.js (browser mock) - @see http://www.envjs.com
-		exec(new String(Files.readAllBytes(Paths.get(THIS.getResource("/env_nashorn.js").toURI()))));
-		// enable loading anonymous, inline and tagged (</script>) javascript code
-		exec("Envjs.scriptTypes['text/javascript']=true;    Envjs.scriptTypes['']=true;");
-		exec("window.name='NG_DEFER_BOOTSTRAP!';  window.location='file:///" + WebAppDir + mainHtmlPageName + "';");
+		/** Env.js (env_nashorn.js) is too slow
+		 // first, load env.js (browser mock) - @see http://www.envjs.com
+		 E.eval(Files.newBufferedReader(Paths.get(THIS.getResource("/env_nashorn.js").toURI())));
+		 // enable loading anonymous, inline and tagged (</script>) javascript code
+		 exec("Envjs.scriptTypes['text/javascript']=true;    Envjs.scriptTypes['']=true;");
+		 exec("window.name='NG_DEFER_BOOTSTRAP!';  window.location='file:///" + WebAppDir + mainHtmlPageName + "';");
+		 */
+		// first, load browser object mocks
+		exec("   var window = { length : 0, location : {}, angular : {} };" +
+				"var document = { " +
+				" addEventListener : function(){}," +
+				" createDocumentFragment : function(){ return{ appendChild:function(){ return { childNodes:[] };}," +
+				" firstChild :{textContent:''} }; }," +
+				" createElement : function(){ return{ pathname:'', setAttribute:function(){} }; }," +
+				" querySelector : function(){}" +
+				"};" +
+				"var angular = window.angular;");
+
+		// then load all scripts referenced in the tested app
+		final Pattern scriptSrcPattern = Pattern.compile(".*src=\"(.*)\".*</script>.*");
+		final Pattern scriptTagPattern = Pattern.compile("<script");
+		for (final String line : Files.readAllLines(Paths.get(webAppDir + mainHtmlPageName))) {
+			for (final String scriptUrl : scriptTagPattern.split(line)) {
+				final Matcher m = scriptSrcPattern.matcher(scriptUrl);
+				if (!m.matches()) continue;
+				E.eval(Files.newBufferedReader(Paths.get(webAppDir + m.group(1))));
+			}
+		}
 
 		// load AngularJS mocks
-		exec(new String(Files.readAllBytes(Paths.get(THIS.getResource("/angular-mocks.js").toURI()))));
+		E.eval(Files.newBufferedReader(Paths.get(THIS.getResource("/angular-mocks.js").toURI())));
 
-		// load test decorator module with dependency on ngMock
+		// load test wrapper module with dependency on ngMock
 		exec("angular.module('" + APP_MODULE + TEST_SUFFIX + "', ['ngMock','" + APP_MODULE + "']);");
 	}
 
