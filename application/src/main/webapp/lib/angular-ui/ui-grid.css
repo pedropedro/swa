@@ -1,3 +1,7 @@
+/*!
+ * ui-grid - v3.0.0-RC.18-96daac0 - 2015-02-01
+ * Copyright (c) 2015 ; License: MIT
+ */
 .ui-grid {
   border: 1px solid #d4d4d4;
   box-sizing: content-box;
@@ -79,34 +83,6 @@
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
-.ui-grid-group-panel {
-  background: #f3f3f3;
-  background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eeeeee), color-stop(1, #ffffff));
-  background: -ms-linear-gradient(bottom, #eeeeee, #ffffff);
-  background: -moz-linear-gradient(center bottom, #eeeeee 0%, #ffffff 100%);
-  background: -o-linear-gradient(#ffffff, #eeeeee);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#eeeeee', GradientType=0);
-  border-bottom: 1px solid #d4d4d4;
-  -webkit-border-top-right-radius: -1px;
-  -webkit-border-bottom-right-radius: 0;
-  -webkit-border-bottom-left-radius: 0;
-  -webkit-border-top-left-radius: -1px;
-  -moz-border-radius-topright: -1px;
-  -moz-border-radius-bottomright: 0;
-  -moz-border-radius-bottomleft: 0;
-  -moz-border-radius-topleft: -1px;
-  border-top-right-radius: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-  border-top-left-radius: -1px;
-  -moz-background-clip: padding-box;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-  min-height: 30px;
-}
-.ui-grid-header-group-panel .hidden {
-  display: none;
-}
 .ui-grid-header-viewport {
   overflow: hidden;
 }
@@ -128,6 +104,8 @@
   top: 0;
   bottom: 0;
   background-color: inherit;
+  border-right: 1px solid;
+  border-color: #d4d4d4;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -148,6 +126,9 @@
 }
 .ui-grid-column-menu-button .ui-grid-icon-angle-down {
   vertical-align: sub;
+}
+.ui-grid-column-menu-button-last-col {
+  margin-right: 25px;
 }
 .ui-grid-column-menu {
   position: absolute;
@@ -212,7 +193,7 @@
   bottom: 0;
   right: 0;
 }
-.ui-grid-filter-container .ui-grid-filter-button [class^="ui-grid-icon"].right {
+.ui-grid-filter-container .ui-grid-filter-button [class^="ui-grid-icon"] {
   position: absolute;
   top: 50%;
   line-height: 32px;
@@ -220,7 +201,7 @@
   right: 10px;
   opacity: 0.66;
 }
-.ui-grid-filter-container .ui-grid-filter-button [class^="ui-grid-icon"].right:hover {
+.ui-grid-filter-container .ui-grid-filter-button [class^="ui-grid-icon"]:hover {
   opacity: 1;
 }
 input[type="text"].ui-grid-filter-input {
@@ -249,7 +230,7 @@ input[type="text"].ui-grid-filter-input:hover {
   border: 1px solid #d4d4d4;
 }
 .ui-grid-render-container {
-  position: relative;
+  position: inherit;
   -webkit-border-top-right-radius: 0;
   -webkit-border-bottom-right-radius: 0px;
   -webkit-border-bottom-left-radius: 0px;
@@ -266,16 +247,19 @@ input[type="text"].ui-grid-filter-input:hover {
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
+.ui-grid-render-container:focus {
+  outline: none;
+}
 .ui-grid-viewport {
   min-height: 20px;
   position: relative;
-  overflow: hidden;
 }
 .ui-grid-viewport :focus {
   outline: none;
 }
 .ui-grid-canvas {
   position: relative;
+  padding-top: 1px;
 }
 .ui-grid-row:nth-child(odd) .ui-grid-cell {
   background-color: #fdfdfd;
@@ -337,9 +321,6 @@ input[type="text"].ui-grid-filter-input:hover {
   border-right: 1px solid;
   border-color: #d4d4d4;
   box-sizing: border-box;
-}
-.ui-grid-cell:last-child {
-  border-right: 0;
 }
 .ui-grid-cell-contents {
   padding: 5px;
@@ -417,34 +398,9 @@ input[type="text"].ui-grid-filter-input:hover {
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
-.ui-grid-group-panel {
-  background: #f3f3f3;
-  background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eeeeee), color-stop(1, #ffffff));
-  background: -ms-linear-gradient(bottom, #eeeeee, #ffffff);
-  background: -moz-linear-gradient(center bottom, #eeeeee 0%, #ffffff 100%);
-  background: -o-linear-gradient(#ffffff, #eeeeee);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#eeeeee', GradientType=0);
-  border-bottom: 1px solid #d4d4d4;
-  border-top: 1px solid #d4d4d4;
-  -webkit-border-top-right-radius: -1px;
-  -webkit-border-bottom-right-radius: 0;
-  -webkit-border-bottom-left-radius: 0;
-  -webkit-border-top-left-radius: -1px;
-  -moz-border-radius-topright: -1px;
-  -moz-border-radius-bottomright: 0;
-  -moz-border-radius-bottomleft: 0;
-  -moz-border-radius-topleft: -1px;
-  border-top-right-radius: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-  border-top-left-radius: -1px;
-  -moz-background-clip: padding-box;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-  min-height: 30px;
-}
-.ui-grid-footer-group-panel .hidden {
-  display: none;
+.ui-grid-grid-footer {
+  float: left;
+  width: 100%;
 }
 .ui-grid-footer-viewport {
   overflow: hidden;
@@ -471,10 +427,6 @@ input[type="text"].ui-grid-filter-input:hover {
 }
 .ui-grid-footer-cell:last-child {
   border-right: 0;
-}
-.ui-grid-footer .ui-grid-vertical-bar {
-  top: 0;
-  bottom: 0;
 }
 input[type="text"].ui-grid-filter-input {
   padding: 0;
@@ -517,9 +469,14 @@ input[type="text"].ui-grid-filter-input:hover {
 .ui-grid-menu-button .ui-grid-menu {
   right: 0;
 }
+.ui-grid-menu-button .ui-grid-menu .ui-grid-menu-mid {
+  overflow-y: scroll;
+  max-height: 300px;
+  border: 1px solid #d4d4d4;
+}
 .ui-grid-menu {
   z-index: 2;
-  position: fixed;
+  position: absolute;
   overflow: hidden;
   padding: 0 10px 20px 10px;
   cursor: pointer;
@@ -648,14 +605,38 @@ input[type="text"].ui-grid-filter-input:hover {
 .ui-grid[dir=rtl] .ui-grid-footer-cell:first-child {
   border-right: 0;
 }
-.ui-grid[dir=rtl] .ui-grid-cell:last-child {
-  border-right: 1px solid;
+.ui-grid[dir=rtl] .ui-grid-cell:last-child,
+.ui-grid[dir=rtl] .ui-grid-header-cell:last-child {
+  border-left: 1px solid;
   border-color: #d4d4d4;
 }
 .ui-grid[dir=rtl] .ui-grid-header-cell:first-child .ui-grid-vertical-bar,
 .ui-grid[dir=rtl] .ui-grid-footer-cell:first-child .ui-grid-vertical-bar,
 .ui-grid[dir=rtl] .ui-grid-cell:first-child .ui-grid-vertical-bar {
   width: 0;
+}
+.ui-grid[dir=rtl] .ui-grid-menu-button {
+  z-index: 2;
+  position: absolute;
+  left: 0;
+  right: auto;
+  background: #f3f3f3;
+  border: 1px solid #d4d4d4;
+  cursor: pointer;
+  min-height: 27px;
+  font-weight: normal;
+}
+.ui-grid[dir=rtl] .ui-grid-menu-button .ui-grid-menu {
+  left: 0;
+  right: auto;
+}
+.ui-grid[dir=rtl] .ui-grid-filter-container .ui-grid-filter-button {
+  right: initial;
+  left: 0;
+}
+.ui-grid[dir=rtl] .ui-grid-filter-container .ui-grid-filter-button [class^="ui-grid-icon"] {
+  right: initial;
+  left: 10px;
 }
 /*
    Animation example, for spinners
@@ -790,7 +771,7 @@ input[type="text"].ui-grid-filter-input:hover {
 * @section font library path
 */
 /*-- END VARIABLES (DO NOT REMOVE THESE COMMENTS) --*/
-.ui-grid-cell-contents:focus {
+.ui-grid-cell-focus {
   outline: 0;
   background-color: #b3c4c7;
 }
@@ -952,6 +933,89 @@ div.ui-grid-cell input.ng-valid {
   display: none;
 }
 
+.ui-grid-pager-panel {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+.ui-grid-pager-container {
+  float: left;
+}
+.ui-grid-pager-control {
+  margin-right: 10px;
+  margin-left: 10px;
+  min-width: 135px;
+  float: left;
+}
+.ui-grid-pager-control button {
+  height: 25px;
+  min-width: 26px;
+}
+.ui-grid-pager-control input {
+  height: 26px;
+  width: 50px;
+  vertical-align: top;
+}
+.ui-grid-pager-control .first-bar {
+  width: 10px;
+  border-left: 2px solid #4d4d4d;
+  margin-top: -6px;
+  height: 12px;
+  margin-left: -3px;
+}
+.ui-grid-pager-control .first-triangle {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 8.7px 5px 0;
+  border-color: transparent #4d4d4d transparent transparent;
+  margin-left: 2px;
+}
+.ui-grid-pager-control .next-triangle {
+  margin-left: 1px;
+}
+.ui-grid-pager-control .prev-triangle {
+  margin-left: 0;
+}
+.ui-grid-pager-control .last-triangle {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 8.7px;
+  border-color: transparent transparent transparent #4d4d4d;
+  margin-left: -1px;
+}
+.ui-grid-pager-control .last-bar {
+  width: 10px;
+  border-left: 2px solid #4d4d4d;
+  margin-top: -6px;
+  height: 12px;
+  margin-left: 1px;
+}
+.ui-grid-pager-row-count-picker {
+  float: left;
+}
+.ui-grid-pager-row-count-picker select {
+  height: 26px;
+  width: 60px;
+}
+.ui-grid-pager-row-count-picker .ui-grid-pager-row-count-label {
+  margin-top: 3px;
+}
+.ui-grid-pager-count-container {
+  float: right;
+  margin-top: 4px;
+  min-width: 50px;
+}
+.ui-grid-pager-count-container .ui-grid-pager-count {
+  margin-right: 10px;
+  margin-left: 10px;
+  float: right;
+}
+
 /* This file contains variable declarations (do not remove this line) */
 /*-- VARIABLES (DO NOT REMOVE THESE COMMENTS) --*/
 /**
@@ -1002,6 +1066,33 @@ div.ui-grid-cell input.ng-valid {
 }
 .ui-grid-pinned-container.ui-grid-pinned-container-left .ui-grid-header-cell:last-child .ui-grid-vertical-bar {
   right: -1px;
+  width: 1px;
+  background-color: #aeaeae;
+}
+.ui-grid-pinned-container.ui-grid-pinned-container-right .ui-grid-header-cell:first-child {
+  box-sizing: border-box;
+  border-left: 1px solid;
+  border-width: 1px;
+  border-color: #aeaeae;
+}
+.ui-grid-pinned-container.ui-grid-pinned-container-right .ui-grid-cell:first-child {
+  box-sizing: border-box;
+  border-left: 1px solid;
+  border-width: 1px;
+  border-color: #aeaeae;
+}
+.ui-grid-pinned-container.ui-grid-pinned-container-right .ui-grid-header-cell:not(:first-child) .ui-grid-vertical-bar,
+.ui-grid-pinned-container .ui-grid-cell:not(:first-child) .ui-grid-vertical-bar {
+  width: 1px;
+}
+.ui-grid-pinned-container.ui-grid-pinned-container-right .ui-grid-header-cell:not(:first-child) .ui-grid-vertical-bar {
+  background-color: #d4d4d4;
+}
+.ui-grid-pinned-container.ui-grid-pinned-container-right .ui-grid-cell:not(:last-child) .ui-grid-vertical-bar {
+  background-color: #aeaeae;
+}
+.ui-grid-pinned-container.ui-grid-pinned-container-first .ui-grid-header-cell:first-child .ui-grid-vertical-bar {
+  left: -1px;
   width: 1px;
   background-color: #aeaeae;
 }
@@ -1112,7 +1203,7 @@ div.ui-grid-cell input.ng-valid {
 * @section font library path
 */
 /*-- END VARIABLES (DO NOT REMOVE THESE COMMENTS) --*/
-.ui-grid-row-selected .ui-grid-cell {
+.ui-grid-row-selected > [ui-grid-row] > .ui-grid-cell {
   background-color: #c9dde1 !important;
 }
 .ui-grid-disable-selection {
