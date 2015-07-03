@@ -70,6 +70,9 @@ class AngularTestUtil {
 		// load AngularJS mocks
 		E.eval(Files.newBufferedReader(Paths.get(THIS.getResource("/angular-mocks.js").toURI())));
 
+	}
+
+	void resetMocks(){
 		// load test wrapper module with dependency on ngMock
 		exec("angular.module('" + APP_MODULE + TEST_SUFFIX + "', ['ngMock','" + APP_MODULE + "']);");
 	}
