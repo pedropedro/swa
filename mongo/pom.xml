@@ -92,9 +92,11 @@
 					<systemPropertyVariables>
 						<MyProperty>MyValue</MyProperty>
 					</systemPropertyVariables>
+					<excludes>
+						<exclude>**/TestDataInitializer.java</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

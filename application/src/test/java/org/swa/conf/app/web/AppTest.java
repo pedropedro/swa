@@ -11,15 +11,13 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+// @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AppTest extends AngularTestUtil {
 
 	@BeforeClass
 	public static void setup1() throws Exception {
-		loadApp("myApp", "myIndex.html");
+		loadApp("myApp", "myIndex.html", Browser.SIMPLE);
 	}
 
 	@Test
@@ -461,10 +459,10 @@ public class AppTest extends AngularTestUtil {
 		);
 	}
 
-	public static void main(final String[] args) throws Exception{
+	public static void main(final String[] args) throws Exception {
 		setup1();
 		final AppTest a = new AppTest();
-		for(int i = 0; i < 100000; i++){
+		for (int i = 0, letsTrainTheFan = 100000; i < letsTrainTheFan; i++) {
 			a.serviceTest();
 			a.mockedDiFactoryTest();
 			a.mockedDiFactoryAndServiceTest();

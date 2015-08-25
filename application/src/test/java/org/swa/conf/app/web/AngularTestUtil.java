@@ -22,12 +22,17 @@ class AngularTestUtil {
 			new String[]{"-Dnashorn.time", "--locale=de_DE", "--global-per-engine"});
 	static final Invocable I = (Invocable) E;
 
+	/** Browser mock - feature rich and slow EnvJs or the simplest possible ? */
+	enum Browser {
+		ENV_JS, SIMPLE
+	}
+
 	private static final boolean MS$ = System.getProperty("os.name").contains("Windows");
 	private static String APP_MODULE;
 	private static final String TEST_SUFFIX = "$Test$";
 
 	/** Load browser mock and AngularJS from @BeforeClass method */
-	static void loadApp(final String appName, final String mainHtmlPageName) throws Exception {
+	static void loadApp(final String appName, final String mainHtmlPageName, final Browser browser) throws Exception {
 
 		APP_MODULE = appName;
 
@@ -38,41 +43,43 @@ class AngularTestUtil {
 		// MAVEN's <project>/webapp folder
 		final String webAppDir = (MS$ ? projectDir.substring(1) : projectDir) + "src/main/webapp/";
 
-		/** Env.js (env_nashorn.js) is too slow
-		 // first, load env.js (browser mock) - @see http://www.envjs.com
-		 E.eval(Files.newBufferedReader(Paths.get(THIS.getResource("/env_nashorn.js").toURI())));
-		 // enable loading anonymous, inline and tagged (</script>) javascript code
-		 exec("Envjs.scriptTypes['text/javascript']=true;    Envjs.scriptTypes['']=true;");
-		 exec("window.name='NG_DEFER_BOOTSTRAP!';  window.location='file:///" + WebAppDir + mainHtmlPageName + "';");
-		 */
-		// first, load browser object mocks
-		exec("   var window = { length : 0, location : {}, angular : {} };" +
-				"var document = { " +
-				" addEventListener : function(){}," +
-				" createDocumentFragment : function(){ return{ appendChild:function(){ return { childNodes:[] };}," +
-				" firstChild :{textContent:''} }; }," +
-				" createElement : function(){ return{ pathname:'', setAttribute:function(){} }; }," +
-				" querySelector : function(){}" +
-				"};" +
-				"var angular = window.angular;");
+		if (browser == Browser.ENV_JS) {
+			// first, load env.js (browser mock) - @see http://www.envjs.com
+			E.eval(Files.newBufferedReader(Paths.get(THIS.getResource("/env_nashorn.js").toURI())));
+			// enable loading anonymous, inline and tagged (</script>) javascript code
+			exec("Envjs.scriptTypes['text/javascript']=true;    Envjs.scriptTypes['']=true;");
+			exec("window.name='NG_DEFER_BOOTSTRAP!'; window.location='file:///" + webAppDir + mainHtmlPageName + "';");
+		} else {
+			// first, load browser object mocks
+			exec("   var window = { length : 0, location : {}, angular : {}, document : {} };" +
+					"var document = { " +
+					" addEventListener : function(){}," +
+					" createDocumentFragment : function(){ return{ appendChild:function(){ return { childNodes:[] };" +
+					"}," +
 
-		// then load all scripts referenced in the tested app
-		final Pattern scriptSrcPattern = Pattern.compile(".*src=\"(.*)\".*</script>.*");
-		final Pattern scriptTagPattern = Pattern.compile("<script");
-		for (final String line : Files.readAllLines(Paths.get(webAppDir + mainHtmlPageName))) {
-			for (final String scriptUrl : scriptTagPattern.split(line)) {
-				final Matcher m = scriptSrcPattern.matcher(scriptUrl);
-				if (!m.matches()) continue;
-				E.eval(Files.newBufferedReader(Paths.get(webAppDir + m.group(1))));
+					" firstChild :{textContent:''} }; }," +
+					" createElement : function(){ return{ pathname:'', setAttribute:function(){} }; }," +
+					" querySelector : function(){}" +
+					"};" +
+					"var angular = window.angular;");
+
+			// then load all scripts referenced in the tested app
+			final Pattern scriptSrcPattern = Pattern.compile(".*src=\"(.*)\".*</script>.*");
+			final Pattern scriptTagPattern = Pattern.compile("<script");
+			for (final String line : Files.readAllLines(Paths.get(webAppDir + mainHtmlPageName))) {
+				for (final String scriptUrl : scriptTagPattern.split(line)) {
+					final Matcher m = scriptSrcPattern.matcher(scriptUrl);
+					if (!m.matches()) continue;
+					E.eval(Files.newBufferedReader(Paths.get(webAppDir + m.group(1))));
+				}
 			}
 		}
-
 		// load AngularJS mocks
 		E.eval(Files.newBufferedReader(Paths.get(THIS.getResource("/angular-mocks.js").toURI())));
 
 	}
 
-	void resetMocks(){
+	void resetMocks() {
 		// load test wrapper module with dependency on ngMock
 		exec("angular.module('" + APP_MODULE + TEST_SUFFIX + "', ['ngMock','" + APP_MODULE + "']);");
 	}
@@ -108,7 +115,7 @@ class AngularTestUtil {
 
 	/** Retrieve property value located in given $scope (default $rootScope) at "p1.p2.m1().p4.0.#!Z()" for example. */
 	@SuppressWarnings("unchecked")
-	<R> R inspectScope(final Class<R> _, final String propertyChain, final Object... inspectedScope) {
+	<R> R inspectScope(final Class<R> clazz, final String propertyChain, final Object... inspectedScope) {
 		Object rs = inspectedScope.length == 0 ? find("$rootScope") : inspectedScope[0];
 		for (final String s : Arrays.asList(propertyChain.split("\\."))) {
 			if (rs == null) break;
@@ -192,7 +199,7 @@ class AngularTestUtil {
 	public interface HttpMock {
 
 		/** Usage: expectGET("my/URL", IGNORE) ==> ignore HTTP Headers in the assertion */
-		final Object IGNORE = exec("function(a){return true;}");
+		Object IGNORE = exec("function(a){return true;}");
 
 		ScriptObjectMirror when(String method, String url, String data, Object headers);
 
