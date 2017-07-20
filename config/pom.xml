@@ -23,7 +23,7 @@
 				<!-- https://github.com/jirutka/rsql-parser -->
 				<groupId>cz.jirutka.rsql</groupId>
 				<artifactId>rsql-parser</artifactId>
-				<version>2.0.0</version>
+				<version>2.1.0</version>
 			</dependency>
 <!-- TEST -->
 			<dependency>
