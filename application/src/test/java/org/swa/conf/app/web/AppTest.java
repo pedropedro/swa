@@ -12,15 +12,18 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+// @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AppTest extends AngularTestUtil {
 
 	@BeforeClass
 	public static void setup1() throws Exception {
-		loadApp("myApp", "myIndex.html");
+		loadApp("myApp", "myIndex.html", Browser.SIMPLE);
 	}
 
 	@Test
 	public void serviceTest() {
+
+		resetMocks();
 
 		boot();
 
@@ -34,6 +37,8 @@ public class AppTest extends AngularTestUtil {
 
 	@Test
 	public void mockedDiFactoryTest() {
+
+		resetMocks();
 
 		mock("myDiFactory", new HashMap<String, Function<Object[], Object>>() {
 			{
@@ -53,6 +58,8 @@ public class AppTest extends AngularTestUtil {
 
 	@Test
 	public void mockedDiFactoryAndServiceTest() {
+
+		resetMocks();
 
 		mock("myDiFactory", new HashMap<String, Function<Object[], Object>>() {
 			{
@@ -79,6 +86,8 @@ public class AppTest extends AngularTestUtil {
 	@Test
 	public void windowAlertTest() {
 
+		resetMocks();
+
 		mock("$window", new HashMap<String, Function<Object[], Object>>() {
 			{
 				put("alert", args -> {
@@ -104,6 +113,8 @@ public class AppTest extends AngularTestUtil {
 	@Test
 	public void windowTest() {
 
+		resetMocks();
+
 		mock("$window", new HashMap<String, Function<Object[], Object>>() {
 			{
 				put("alert", args -> args[0]);
@@ -122,6 +133,8 @@ public class AppTest extends AngularTestUtil {
 
 	@Test
 	public void factoryDependsOnForeignModuleTest() {
+
+		resetMocks();
 
 		boot();
 
@@ -163,6 +176,8 @@ public class AppTest extends AngularTestUtil {
 	@Test
 	public void directiveWithTemplateTest() {
 
+		resetMocks();
+
 		boot();
 
 		final String htmlTemplate = (String) findDirective("templateDir").get("template");
@@ -173,6 +188,8 @@ public class AppTest extends AngularTestUtil {
 
 	@Test
 	public void directiveWithLinkTest() {
+
+		resetMocks();
 
 		boot();
 
@@ -186,6 +203,8 @@ public class AppTest extends AngularTestUtil {
 
 	@Test
 	public void filterTest() {
+
+		resetMocks();
 
 		boot();
 
@@ -208,6 +227,8 @@ public class AppTest extends AngularTestUtil {
 
 	@Test
 	public void controllerTest() {
+
+		resetMocks();
 
 		boot();
 
@@ -262,6 +283,8 @@ public class AppTest extends AngularTestUtil {
 	@Test
 	public void controllerWithServerErrorTest() {
 
+		resetMocks();
+
 		boot();
 
 		execController("MainCtrl", getScopeMock());
@@ -289,6 +312,8 @@ public class AppTest extends AngularTestUtil {
 
 	@Test
 	public void scopeInheritanceTest() {
+
+		resetMocks();
 
 		boot();
 
@@ -326,6 +351,8 @@ public class AppTest extends AngularTestUtil {
 
 	@Test
 	public void eventEmitTest() {
+
+		resetMocks();
 
 		boot();
 
@@ -365,6 +392,8 @@ public class AppTest extends AngularTestUtil {
 	@Test
 	public void eventBroadcastTest() {
 
+		resetMocks();
+
 		boot();
 
 		// prepare a $scope hierarchy
@@ -402,6 +431,8 @@ public class AppTest extends AngularTestUtil {
 	@Test
 	public void decoratorTest() {
 
+		resetMocks();
+
 		boot();
 
 		// myServiceToBeDecorated:  f5(n) := n*n,  f4(p) := 'C' + ( p + 21 )
@@ -426,5 +457,26 @@ public class AppTest extends AngularTestUtil {
 						"child.b.x='x1'; print('x1 x1:',p.b.x,child.b.x);" +
 						""
 		);
+	}
+
+	public static void main(final String[] args) throws Exception {
+		setup1();
+		final AppTest a = new AppTest();
+		for (int i = 0, letsTrainTheFan = 100000; i < letsTrainTheFan; i++) {
+			a.serviceTest();
+			a.mockedDiFactoryTest();
+			a.mockedDiFactoryAndServiceTest();
+			a.windowAlertTest();
+			a.windowTest();
+			a.factoryDependsOnForeignModuleTest();
+			a.directiveWithTemplateTest();
+			a.filterTest();
+			a.controllerTest();
+			a.controllerWithServerErrorTest();
+			a.scopeInheritanceTest();
+			a.eventEmitTest();
+			a.eventBroadcastTest();
+			a.decoratorTest();
+		}
 	}
 }
